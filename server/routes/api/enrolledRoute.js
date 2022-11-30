@@ -5,7 +5,7 @@ router.get("/", enrolledController.getAllDoc);
 router.post("/register", enrolledController.createDoc);
 
 // router.patch("/update", activeStudentController.updateDocByID);
-// router.get("/search", activeStudentController.getDocByID);
+router.get("/search/:studID", enrolledController.getDocByID);
 router.delete("/delete/", enrolledController.deleteDocByID);
 
 module.exports = router;

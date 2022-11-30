@@ -9,27 +9,25 @@ const userSchema = new Schema(
     //   required: true,
     //   auto: true,
     // },
+    taskScoreID: {
+      type: String,
+      required: true,
+    },
     taskID: {
       type: String,
       required: true,
     },
-    taskType: {
-      type: String,
-      required: true,
-    },
-    subjectID: {
-      type: String,
-      required: true,
-    },
-    schoolYearID: {
+
+    studID: {
       type: String,
       required: true,
     },
 
-    taskTotalScore: {
+    taskScore: {
       type: Number,
       required: true,
     },
+
     empID: {
       type: String,
       required: true,
@@ -40,4 +38,4 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
-module.exports = mongoose.model("Task", userSchema);
+module.exports = mongoose.model("TaskScore", userSchema);

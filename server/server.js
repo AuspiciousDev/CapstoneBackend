@@ -55,7 +55,7 @@ app.use("/logout", require("./routes/logout"));
 app.use("/api/loginhistories", require("./routes/loginhistoryRoute"));
 
 // Require JWT Token to access data
-// app.use(verifyJWT);
+app.use(verifyJWT);
 // jwt protected routes
 app.use("/api/users", require("./routes/api/usersRoute"));
 app.use("/api/students", require("./routes/api/studentsRoute"));

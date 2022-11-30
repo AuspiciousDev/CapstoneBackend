@@ -3,21 +3,7 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
-    // taskID: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   index: true,
-    //   required: true,
-    //   auto: true,
-    // },
-    taskID: {
-      type: String,
-      required: true,
-    },
-    taskType: {
-      type: String,
-      required: true,
-    },
-    subjectID: {
+    empID: {
       type: String,
       required: true,
     },
@@ -25,19 +11,23 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-
-    taskTotalScore: {
-      type: Number,
-      required: true,
-    },
-    empID: {
+    levelID: {
       type: String,
       required: true,
     },
-    description: {
+    sectionID: {
       type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+    },
+    createdBy: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }
 );
-module.exports = mongoose.model("Task", userSchema);
+module.exports = mongoose.model("Adviser", userSchema);

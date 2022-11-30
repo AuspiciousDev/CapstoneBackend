@@ -100,8 +100,9 @@ const getStudentByID = async (req, res) => {
       .status(400)
       .json({ message: `Student ID ${req.params.studID} not found` });
   }
-  res.json(student);
+  res.status(200).json(student);
 };
+
 const updateStudentByID = async (req, res) => {
   console.log(req.body);
   if (!req?.params?.studID) {

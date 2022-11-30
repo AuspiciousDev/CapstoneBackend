@@ -62,6 +62,51 @@ const createDoc = async (req, res) => {
     console.error(error);
   }
 };
+
+const getDocByID = async (req, res) => {
+  if (!req?.params?.studID) {
+    return res.status(400).json({ message: "ID required!" });
+  }
+  const findID = await Enrolled.aggregate([
+    {
+      $lookup: {
+        from: "students",
+        localField: "studID",
+        foreignField: "studID",
+        as: "result",
+      },
+    },
+    {
+      $unwind: {
+        path: "$result",
+      },
+    },
+    {
+      $set: {
+        firstName: {
+          $toString: "$result.firstName",
+        },
+        middleName: {
+          $toString: "$result.middleName",
+        },
+        lastName: {
+          $toString: "$result.lastName",
+        },
+        gender: {
+          $toString: "$result.gender",
+        },
+        email: {
+          $toString: "$result.email",
+        },
+      },
+    },
+  ]);
+  if (!findID) {
+    return res.status(400).json({ message: `${sectionID} not found!` });
+  }
+  res.status(200).json(findID);
+};
+
 const deleteDocByID = async (req, res) => {
   const { enrolledID } = req.body;
   if (!enrolledID) {
@@ -77,7 +122,7 @@ const deleteDocByID = async (req, res) => {
 module.exports = {
   createDoc,
   getAllDoc,
-  //   getDocByID,
+  getDocByID,
   //   updateDocByID,
   deleteDocByID,
 };

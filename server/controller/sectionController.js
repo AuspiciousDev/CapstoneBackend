@@ -104,7 +104,8 @@ const deleteDocByID = async (req, res) => {
   }
 
   const findEnroll = await Enrolled.find({ sectionID });
-  if (findEnroll) {
+  console.log(findEnroll);
+  if (findEnroll.length > 0) {
     return res.status(400).json({
       message: `Cannot delete ${sectionID} in Enrolled, A record/s currently exists with ${sectionID}. To delete the record, Remove all records that contains ${sectionID} `,
     });
