@@ -8,5 +8,6 @@ router.get("/search", schoolyearController.getDocByID);
 router.post("/register", schoolyearController.createDoc);
 router.delete("/delete/", schoolyearController.deleteDocByID);
 router.patch("/status", schoolyearController.toggleStatusById);
+router.get("/status/active", schoolyearController.getDocActive);
 
 module.exports = router;

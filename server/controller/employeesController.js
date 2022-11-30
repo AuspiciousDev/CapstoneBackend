@@ -266,13 +266,14 @@ const deleteEmployeeByID = async (req, res) => {
     return res.status(400).json({ message: `${empID} not found!` });
   }
   const findUser = await User.find({ username: empID });
-  if (findUser) {
+  console.log(findUser);
+  if (findUser.length < 0) {
     return res.status(400).json({
       message: `Cannot delete ${empID}, A records currently exists with ${empID} in Users. To delete the record, Remove all records that contains ${empID} `,
     });
   }
   const findGrade = await Grade.find({ empID });
-  if (findGrade) {
+  if (findGrade.length < 0) {
     return res.status(400).json({
       message: `Cannot delete ${empID}, A records currently exists with ${empID} in Grades. To delete the record, Remove all records that contains ${empID} `,
     });

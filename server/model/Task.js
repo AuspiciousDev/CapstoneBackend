@@ -17,6 +17,10 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    taskName: {
+      type: String,
+      required: true,
+    },
     subjectID: {
       type: String,
       required: true,
@@ -26,13 +30,17 @@ const userSchema = new Schema(
       required: true,
     },
 
-    taskTotalScore: {
+    maxPoints: {
       type: Number,
       required: true,
     },
     empID: {
       type: String,
       required: true,
+    },
+    status: {
+      type: Boolean,
+      default: true,
     },
     description: {
       type: String,

@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const createNewUser = async (req, res) => {
   // Retrieve data
   let verifyUserExists;
+  var userType;
   const roles = [];
   const { username, email, password } = req.body;
   console.log(req.body);
@@ -23,7 +24,8 @@ const createNewUser = async (req, res) => {
   verifyUserExists = await Employee.findOne({ empID: username, email: email })
     .lean()
     .exec();
-  console.log("Register1: ", verifyUserExists);
+  console.log("Register12: ", verifyUserExists);
+  userType = "employee";
   if (
     !verifyUserExists ||
     verifyUserExists === null ||
@@ -33,6 +35,7 @@ const createNewUser = async (req, res) => {
       .lean()
       .exec();
     console.log("Register2: ", verifyUserExists);
+    userType = "student";
     if (
       !verifyUserExists ||
       verifyUserExists === null ||
@@ -47,15 +50,18 @@ const createNewUser = async (req, res) => {
   } else {
     roles.push(parseInt(verifyUserExists.empType));
   }
-
+  console.log("userType :", userType);
   const hashedPassword = await bcrypt.hash(password, 10);
-  const userObject = { username, password: hashedPassword, roles };
+  const userObject = { username, password: hashedPassword, roles, userType };
+
+  console.log("userObject :", userObject);
+
   try {
     // const empObjectRes = await Employee.create(empObject);
     const response = await User.create(userObject);
     res.status(201).json(response);
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 };
 module.exports = {

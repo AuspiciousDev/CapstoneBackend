@@ -5,19 +5,23 @@ const createDoc = async (req, res) => {
     taskID,
     taskType,
     subjectID,
-    schoolYearID,
-    taskTotalScore,
+    levelID,
+    maxPoints,
     empID,
     description,
+    schoolYearID,
+    taskName,
   } = req.body;
+  console.log(req.body);
   if (
     !taskID ||
+    !taskName ||
     !taskType ||
     !subjectID ||
-    !schoolYearID ||
-    !taskTotalScore ||
+    !levelID ||
+    !maxPoints ||
     !empID ||
-    !description
+    !schoolYearID
   ) {
     return res.status(400).json({ message: "Incomplete Fields!" });
   }
@@ -31,9 +35,11 @@ const createDoc = async (req, res) => {
   const docObject = {
     taskID,
     taskType,
+    taskName,
     subjectID,
+    levelID,
     schoolYearID,
-    taskTotalScore,
+    maxPoints,
     empID,
     description,
   };

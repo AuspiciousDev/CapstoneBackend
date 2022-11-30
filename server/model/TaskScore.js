@@ -10,15 +10,25 @@ const userSchema = new Schema(
     //   auto: true,
     // },
     taskScoreID: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      index: true,
       required: true,
+      auto: true,
     },
+    // taskScoreID: {
+    //   type: String,
+    //   required: true,
+    // },
     taskID: {
       type: String,
       required: true,
     },
 
     studID: {
+      type: String,
+      required: true,
+    },
+    subjectID: {
       type: String,
       required: true,
     },

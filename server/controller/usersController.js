@@ -108,8 +108,11 @@ const createNewUser = async (req, res) => {
     return res.status(409).json({ message: "Username already registered!" });
   }
   verifyUserExists = await Employee.findOne({ empID: username }).lean().exec();
-  console.log("Register1: ", verifyUserExists);
-  userType = "employee";
+  console.log("Register12: ", verifyUserExists);
+
+  if (verifyUserExists.length > 0) {
+    userType = "employee";
+  }
   if (
     !verifyUserExists ||
     verifyUserExists === null ||

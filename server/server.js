@@ -14,7 +14,7 @@ const mongoose = require("mongoose");
 
 const corsOptions = require("./config/corsOptions");
 const connectDB = require("./config/dbConn");
-const PORT = process.env.PORT || 3600;
+const PORT = process.env.PORT || 4600;
 
 // Connect to MongoDB
 connectDB();
@@ -62,6 +62,8 @@ app.use("/api/students", require("./routes/api/studentsRoute"));
 app.use("/api/grades", require("./routes/api/gradesRoute"));
 app.use("/api/employees", require("./routes/api/employeesRoute"));
 app.use("/api/subjects", require("./routes/api/subjectsRoute"));
+app.use("/api/tasks", require("./routes/api/taskRoute"));
+app.use("/api/taskScore", require("./routes/api/taskScoreRoute"));
 
 app.use("/api/levels", require("./routes/api/levelsRoute"));
 app.use("/api/sections", require("./routes/api/sectionsRoute"));

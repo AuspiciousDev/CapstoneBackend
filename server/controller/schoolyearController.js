@@ -62,6 +62,15 @@ const getDocByID = async (req, res) => {
   }
   res.json(findID);
 };
+const getDocActive = async (req, res) => {
+  const findID = await SchoolYear.findOne({ status: true }).exec();
+  if (!findID) {
+    return res
+      .status(400)
+      .json({ message: ` No Active School Year not found!` });
+  }
+  res.status(200).json(findID);
+};
 const updateDocByID = async (req, res) => {
   const { schoolYearID } = req.body;
   if (!schoolYearID) {
@@ -170,4 +179,5 @@ module.exports = {
   updateDocByID,
   deleteDocByID,
   toggleStatusById,
+  getDocActive,
 };
