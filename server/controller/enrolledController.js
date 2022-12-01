@@ -1,5 +1,7 @@
 const Enrolled = require("../model/Enrolled");
 const Student = require("../model/Student");
+const Grade = require("../model/Grade");
+const TaskScore = require("../model/TaskScore");
 const getAllDoc = async (req, res) => {
   const doc = await Enrolled.find().sort({ createdAt: -1 }).lean();
   if (!doc) return res.status(204).json({ message: "No Data Found!" });
@@ -115,16 +117,64 @@ const getDocByID = async (req, res) => {
 };
 
 const deleteDocByID = async (req, res) => {
-  const { enrolledID } = req.body;
-  if (!enrolledID) {
+  console.log("Delete Enrolled: ", req.body);
+  const { enrolledID, schoolYearID } = req.body;
+  if (!enrolledID || !schoolYearID) {
     return res.status(400).json({ message: "ID required!" });
   }
   const findID = await Enrolled.findOne({ enrolledID }).exec();
+  console.log("Enrolled FindID: ", findID);
   if (!findID) {
     return res.status(400).json({ message: `${enrolledID} not found!` });
   }
+  const findGrade = await Grade.findOne({ enrolledID }).exec();
+  console.log("Enrolled FindGrade: ", findGrade);
+  console.log("Enrolled FindGrade1: ", findID.studID);
+  if (findGrade) {
+    return res.status(400).json({
+      message: `Cannot delete ${findID.studID} in Enrolled, A record/s currently exists with ${findID.studID} in Grades. To delete the record, Remove all records that contains ${findID.studID} and try again.`,
+    });
+  }
+  const findTask = await TaskScore.findOne({ studID, schoolYearID }).exec();
+
+  if (findTask) {
+    return res.status(400).json({
+      message: `Cannot delete ${findID.studID} in Enrolled, A record/s currently exists with ${findID.studID} in Tasks. To delete the record, Remove all records that contains ${findID.studID} and try again.`,
+    });
+  }
   const deleteItem = await findID.deleteOne({ enrolledID });
   res.status(201).json(deleteItem);
+};
+const toggleStatusById = async (req, res) => {
+  console.log("Enrolled Toggle :", req.body);
+  const { enrolledID, studID, schoolYearID, status } = req.body;
+  if (!enrolledID || !studID || !schoolYearID) {
+    return res.status(400).json({ message: "ID required to toggle status!" });
+  }
+
+  const findID = await Enrolled.findOne({
+    enrolledID,
+    studID,
+    schoolYearID,
+  }).exec();
+  if (!findID) {
+    return res
+      .status(400)
+      .json({ message: `${studID} not found in year ${schoolYearID} !` });
+  }
+  const updateItem = await Enrolled.findOneAndUpdate(
+    { enrolledID: enrolledID },
+    {
+      status,
+    }
+  );
+
+  if (!updateItem) {
+    return res.status(400).json({ message: "No Student" });
+  }
+  // const result = await response.save();
+  console.log("Enrolled update : ", updateItem);
+  res.json(updateItem);
 };
 module.exports = {
   createDoc,
@@ -132,4 +182,5 @@ module.exports = {
   getDocByID,
   //   updateDocByID,
   deleteDocByID,
+  toggleStatusById,
 };

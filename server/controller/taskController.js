@@ -60,7 +60,42 @@ const getAllDoc = async (req, res) => {
   if (!task) return res.status(204).json({ message: "No record found!" });
   res.status(200).json(task);
 };
+const toggleStatusById = async (req, res) => {
+  console.log(req.body);
+  const { taskID, status } = req.body;
+  if (!taskID) {
+    return res.status(400).json({ message: "Task ID required!" });
+  }
+
+  const findID = await Task.findOne({
+    taskID: taskID.toLowerCase(),
+  }).exec();
+  if (!findID) {
+    return res.status(400).json({ message: `${taskID} not found!` });
+  }
+  const findGrade = await Grade.findOne({ taskID }).exec();
+  if (findGrade) {
+    return res.status(400).json({
+      message: `Cannot delete ${findID.taskID} in Tasks, A record/s currently exists with ${findID.taskID} in Grades. To delete the record, Remove all records that contains ${findID.taskID} and try again.`,
+    });
+  }
+  const updateItem = await Task.findOneAndUpdate(
+    { taskID: taskID.toLowerCase() },
+    {
+      status,
+    }
+  );
+
+  if (!updateItem) {
+    return res.status(400).json({ message: "No Task!" });
+  }
+  //const result = await response.save();
+  res.json(updateItem);
+  console.log(updateItem);
+};
+
 module.exports = {
   createDoc,
   getAllDoc,
+  toggleStatusById,
 };
