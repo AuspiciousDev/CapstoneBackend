@@ -3,7 +3,7 @@ const TaskScore = require("../model/TaskScore");
 const createDoc = async (req, res) => {
   const { taskID, studID, subjectID, taskScore, empID, description } = req.body;
   console.log(req.body);
-  if (!taskID || !studID || !subjectID || !taskScore || !empID || !empID) {
+  if (!taskID || !studID || !subjectID || !taskScore || !empID) {
     return res.status(400).json({ message: "Incomplete Fields!" });
   }
   const duplicate = await TaskScore.findOne({
@@ -36,12 +36,12 @@ const createDoc = async (req, res) => {
   }
 };
 
-const getAllDoc = async (req, res) => {
+const getAllDoc1 = async (req, res) => {
   const task = await TaskScore.find();
   if (!task) return res.status(204).json({ message: "No record found!" });
   res.status(200).json(task);
 };
-const getAllDoca = async (req, res) => {
+const getAllDoc = async (req, res) => {
   const task = await TaskScore.aggregate([
     {
       $lookup: {
@@ -60,6 +60,12 @@ const getAllDoca = async (req, res) => {
       $set: {
         taskName: {
           $toString: "$profile.taskName",
+        },
+        taskType: {
+          $toString: "$profile.taskType",
+        },
+        maxPoints: {
+          $toString: "$profile.maxPoints",
         },
       },
     },

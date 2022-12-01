@@ -64,6 +64,7 @@ const createDoc = async (req, res) => {
 };
 
 const getDocByID = async (req, res) => {
+  const studID = req?.params?.studID;
   if (!req?.params?.studID) {
     return res.status(400).json({ message: "ID required!" });
   }
@@ -79,6 +80,11 @@ const getDocByID = async (req, res) => {
     {
       $unwind: {
         path: "$result",
+      },
+    },
+    {
+      $match: {
+        studID: `${studID}`,
       },
     },
     {
@@ -100,10 +106,11 @@ const getDocByID = async (req, res) => {
         },
       },
     },
-  ]);
+  ]).exec();
   if (!findID) {
     return res.status(400).json({ message: `${sectionID} not found!` });
   }
+  console.log(findID);
   res.status(200).json(findID);
 };
 

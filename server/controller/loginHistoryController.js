@@ -54,6 +54,59 @@ const getAllDoc = async (req, res) => {
   if (!doc) return res.status(204).json({ message: "No Data Found!" });
   res.status(200).json(doc);
 };
+
+const getAllEmpDoc = async (req, res) => {
+  // const doc = await LoginHistory.find().sort({ createdAt: -1 }).lean();
+  const doc = await LoginHistory.aggregate([
+    {
+      $lookup: {
+        from: "employees",
+        localField: "username",
+        foreignField: "empID",
+        as: "result",
+      },
+    },
+    {
+      $unwind: {
+        path: "$result",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "username",
+        foreignField: "username",
+        as: "usersInfo",
+      },
+    },
+    {
+      $unwind: {
+        path: "$usersInfo",
+      },
+    },
+    {
+      $set: {
+        firstName: {
+          $toString: "$result.firstName",
+        },
+        lastName: {
+          $toString: "$result.lastName",
+        },
+        middleName: {
+          $toString: "$result.middleName",
+        },
+        userType: {
+          $toString: "$usersInfo.userType",
+        },
+        imgURL: {
+          $toString: "$result.imgURL",
+        },
+      },
+    },
+  ]);
+  if (!doc) return res.status(204).json({ message: "No Data Found!" });
+  res.status(200).json(doc);
+};
 const createDoc = async (req, res) => {
   // Retrieve data
   console.log(req.body);
@@ -73,4 +126,5 @@ const createDoc = async (req, res) => {
 module.exports = {
   getAllDoc,
   createDoc,
+  getAllEmpDoc,
 };
