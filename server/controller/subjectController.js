@@ -29,6 +29,15 @@ const getAllDoc = async (req, res) => {
   if (!subject) return res.status(204).json({ message: "No record found!" });
   res.status(200).json(subject);
 };
+const getAllDocByLevel = async (req, res) => {
+  console.log("getAllDocByLevel :",req?.params?.levelID);
+  if (!req?.params?.levelID) {
+    return res.status(400).json({ message: "LevelID is required!" });
+  }
+  const subject = await Subject.find({ levelID: req?.params?.levelID });
+  if (!subject) return res.status(204).json({ message: "No record found!" });
+  res.status(200).json(subject);
+};
 
 const getDocByID = async (req, res) => {
   if (!req?.params?.searchID) {
@@ -115,4 +124,5 @@ module.exports = {
   updateDocByID,
   deleteDocByID,
   toggleStatusById,
+  getAllDocByLevel,
 };

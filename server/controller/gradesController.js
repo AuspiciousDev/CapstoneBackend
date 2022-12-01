@@ -7,6 +7,58 @@ const getAllDoc = async (req, res) => {
   res.status(200).json(doc);
 };
 
+const getDocByStudIDandYear = async (req, res) => {
+  console.log(req?.params?.studID, req?.params?.year);
+  if (!req?.params?.studID || !req?.params?.year) {
+    return res
+      .status(400)
+      .json({ message: "Student ID and Year is required!" });
+  }
+
+  const findDoc = await Grade.aggregate([
+    {
+      $lookup: {
+        from: "students",
+        localField: "studID",
+        foreignField: "studID",
+        as: "profile",
+      },
+    },
+    {
+      $unwind: {
+        path: "$profile",
+      },
+    },
+    {
+      $match: {
+        studID: `${req?.params?.studID}`,
+        schoolYearID: "2023",
+      },
+    },
+    {
+      $lookup: {
+        from: "subjects",
+        localField: "subjectID",
+        foreignField: "subjectID",
+        as: "subject",
+      },
+    },
+    {
+      $unwind: {
+        path: "$subject",
+      },
+    },
+    {
+      $set: {
+        subjectName: {
+          $toString: "$subject.subjectName",
+        },
+      },
+    },
+  ]);
+  if (!findDoc) return res.status(204).json({ message: "No Data Found!" });
+  res.status(200).json(findDoc);
+};
 const createDoc = async (req, res) => {
   // Retrieve data
   const { studID, empID, subjectID, schoolYearID, quarter, grade } = req.body;
@@ -64,4 +116,5 @@ module.exports = {
   // getDocByID,
   // updateDocByID,
   deleteDocByID,
+  getDocByStudIDandYear,
 };
