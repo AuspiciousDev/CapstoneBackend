@@ -1,4 +1,7 @@
 const Subject = require("../model/Subject");
+const Grade = require("../model/Grade");
+const Task = require("../model/Task");
+const TaskScore = require("../model/TaskScore");
 
 const createDoc = async (req, res) => {
   const { subjectID, levelID, subjectName, description } = req.body;
@@ -30,7 +33,7 @@ const getAllDoc = async (req, res) => {
   res.status(200).json(subject);
 };
 const getAllDocByLevel = async (req, res) => {
-  console.log("getAllDocByLevel :",req?.params?.levelID);
+  console.log("getAllDocByLevel :", req?.params?.levelID);
   if (!req?.params?.levelID) {
     return res.status(400).json({ message: "LevelID is required!" });
   }
@@ -84,6 +87,29 @@ const deleteDocByID = async (req, res) => {
   if (!findID) {
     return res.status(400).json({ message: `${subjectID} not found!` });
   }
+  const findGrade = await Grade.findOne({ subjectID });
+  console.log(findGrade);
+  if (findGrade) {
+    return res.status(400).json({
+      message: `Cannot delete ${subjectID} in Subject, A record/s currently exists with ${subjectID} in Grades. To delete the record, Remove all records that contains ${subjectID} `,
+    });
+  }
+
+  const findTask = await Task.findOne({ subjectID });
+  console.log(findTask);
+  if (findTask) {
+    return res.status(400).json({
+      message: `Cannot delete ${subjectID} in Subject, A record/s currently exists with ${subjectID} in Tasks. To delete the record, Remove all records that contains ${subjectID} `,
+    });
+  }
+  const findTaskScore = await TaskScore.findOne({ subjectID });
+  console.log(findTaskScore);
+  if (findTaskScore) {
+    return res.status(400).json({
+      message: `Cannot delete ${subjectID} in Subject, A record/s currently exists with ${subjectID} in Scores. To delete the record, Remove all records that contains ${subjectID} `,
+    });
+  }
+
   const deleteItem = await findID.deleteOne({ subjectID });
   res.json(deleteItem);
 };

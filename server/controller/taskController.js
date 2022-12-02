@@ -1,4 +1,6 @@
 const Task = require("../model/Task");
+const Grade = require("../model/Grade");
+const TaskScore = require("../model/TaskScore");
 
 const createDoc = async (req, res) => {
   const {
@@ -73,12 +75,18 @@ const toggleStatusById = async (req, res) => {
   if (!findID) {
     return res.status(400).json({ message: `${taskID} not found!` });
   }
-  const findGrade = await Grade.findOne({ taskID }).exec();
-  if (findGrade) {
-    return res.status(400).json({
-      message: `Cannot delete ${findID.taskID} in Tasks, A record/s currently exists with ${findID.taskID} in Grades. To delete the record, Remove all records that contains ${findID.taskID} and try again.`,
-    });
-  }
+  // const findGrade = await Grade.findOne({ taskID }).exec();
+  // if (findGrade) {
+  //   return res.status(400).json({
+  //     message: `Cannot delete ${findID.taskID} in Tasks, A record/s currently exists with ${findID.taskID} in Grades. To delete the record, Remove all records that contains ${findID.taskID} and try again.`,
+  //   });
+  // }
+  // const findScore = await TaskScore.findOne({ taskID }).exec();
+  // if (findScore) {
+  //   return res.status(400).json({
+  //     message: `Cannot delete ${findID.taskID} in Tasks, A record/s currently exists with ${findID.taskID} in Scores. To delete the record, Remove all records that contains ${findID.taskID} and try again.`,
+  //   });
+  // }
   const updateItem = await Task.findOneAndUpdate(
     { taskID: taskID.toLowerCase() },
     {
@@ -94,8 +102,28 @@ const toggleStatusById = async (req, res) => {
   console.log(updateItem);
 };
 
+const deleteByDocID = async (req, res) => {
+  const { taskID } = req.body;
+  if (!taskID) {
+    return res.status(400).json({ message: "Task ID required!" });
+  }
+  const findID = await Task.findOne({ taskID }).exec();
+  if (!findID) {
+    return res.status(400).json({ message: `${taskID} not found!` });
+  }
+  const findTaskScore = await TaskScore.findOne({ taskID });
+  console.log(findTaskScore);
+  if (findTaskScore) {
+    return res.status(400).json({
+      message: `Cannot delete ${taskID} in Tasks, A record/s currently exists with ${taskID} in Scores. To delete the record, Remove all records that contains ${taskID} `,
+    });
+  }
+  const deleteItem = await findID.deleteOne({ taskID });
+  res.status(200).json(deleteItem);
+};
 module.exports = {
   createDoc,
   getAllDoc,
   toggleStatusById,
+  deleteByDocID,
 };
