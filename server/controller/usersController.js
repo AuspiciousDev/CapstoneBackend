@@ -33,7 +33,82 @@ const getAllUsers = async (req, res) => {
   if (!users) return res.status(204).json({ message: "No Users Found!" });
   res.status(200).json(users);
 };
+const getDocEmployee = async (req, res) => {
+  const users = await User.aggregate([
+    {
+      $lookup: {
+        from: "employees",
+        localField: "username",
+        foreignField: "empID",
+        as: "profile",
+      },
+    },
+    {
+      $unwind: {
+        path: "$profile",
+      },
+    },
+    {
+      $match: {
+        userType: "employee",
+      },
+    },
+    {
+      $set: {
+        lastName: {
+          $toString: "$profile.lastName",
+        },
+        firstName: {
+          $toString: "$profile.firstName",
+        },
+        middleName: {
+          $toString: "$profile.middleName",
+        },
+      },
+    },
+  ]);
 
+  if (!users) return res.status(204).json({ message: "No Users Found!" });
+  res.status(200).json(users);
+};
+const getDocStudent = async (req, res) => {
+  const users = await User.aggregate([
+    {
+      $lookup: {
+        from: "students",
+        localField: "username",
+        foreignField: "studID",
+        as: "profile",
+      },
+    },
+    {
+      $unwind: {
+        path: "$profile",
+      },
+    },
+    {
+      $match: {
+        userType: "student",
+      },
+    },
+    {
+      $set: {
+        lastName: {
+          $toString: "$profile.lastName",
+        },
+        firstName: {
+          $toString: "$profile.firstName",
+        },
+        middleName: {
+          $toString: "$profile.middleName",
+        },
+      },
+    },
+  ]);
+
+  if (!users) return res.status(204).json({ message: "No Users Found!" });
+  res.status(200).json(users);
+};
 const createNewUser1 = async (req, res) => {
   // Retrieve data
   let defPassword;
@@ -307,4 +382,6 @@ module.exports = {
   getUserByID,
   deleteDocByID,
   getUserProfileByID,
+  getDocEmployee,
+  getDocStudent,
 };

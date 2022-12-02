@@ -27,6 +27,16 @@ const getAllDoc = async (req, res) => {
         },
       },
     },
+    // {
+    //   $match: {
+    //     departmentID: "jhs",
+    //   },
+    // },
+    {
+      $sort: {
+        levelNum: 1,
+      },
+    },
   ]);
   if (!doc) return res.status(204).json({ message: "No Data Found!" });
   res.status(200).json(doc);

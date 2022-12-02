@@ -86,7 +86,7 @@ const getDocByID = async (req, res) => {
     },
     {
       $match: {
-        studID: `${studID}`,
+        studID: `${req?.params?.studID}`,
       },
     },
     {

@@ -13,6 +13,10 @@ const userSchema = new Schema(
     description: {
       type: String,
     },
+    createdBy: {
+      type: String,
+      required: true,
+    },
     status: {
       type: Boolean,
       default: true,

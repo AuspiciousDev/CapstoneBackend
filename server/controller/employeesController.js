@@ -1,6 +1,8 @@
 const Employee = require("../model/Employee");
 const User = require("../model/User");
 const Grade = require("../model/Grade");
+const TaskScore = require("../model/TaskScore");
+const Task = require("../model/Task");
 
 const createNewEmployee = async (req, res) => {
   const {
@@ -265,17 +267,30 @@ const deleteEmployeeByID = async (req, res) => {
   if (!findID) {
     return res.status(400).json({ message: `${empID} not found!` });
   }
-  const findUser = await User.find({ username: empID });
+  const findUser = await User.findOne({ username: empID });
   console.log(findUser);
-  if (findUser.length < 0) {
+  if (findUser) {
     return res.status(400).json({
       message: `Cannot delete ${empID}, A records currently exists with ${empID} in Users. To delete the record, Remove all records that contains ${empID} `,
     });
   }
   const findGrade = await Grade.find({ empID });
-  if (findGrade.length < 0) {
+  if (findGrade) {
     return res.status(400).json({
       message: `Cannot delete ${empID}, A records currently exists with ${empID} in Grades. To delete the record, Remove all records that contains ${empID} `,
+    });
+  }
+
+  const findTask = await Task.find({ empID });
+  if (findTask) {
+    return res.status(400).json({
+      message: `Cannot delete ${empID}, A records currently exists with ${empID} in Tasks. To delete the record, Remove all records that contains ${empID} `,
+    });
+  }
+  const findTaskScore = await TaskScore.find({ empID });
+  if (findTaskScore) {
+    return res.status(400).json({
+      message: `Cannot delete ${empID}, A records currently exists with ${empID} in Scores. To delete the record, Remove all records that contains ${empID} `,
     });
   }
 
