@@ -101,6 +101,12 @@ const getAllEmpDoc = async (req, res) => {
         imgURL: {
           $toString: "$result.imgURL",
         },
+        gender: {
+          $toString: "$result.gender",
+        },
+        email: {
+          $toString: "$result.email",
+        },
       },
     },
     {

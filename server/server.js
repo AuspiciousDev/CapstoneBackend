@@ -34,11 +34,10 @@ app.use(cors(corsOptions));
 //   })
 // );
 
-// built-in middleware to handle urlencoded form data
-app.use(express.urlencoded({ extended: false }));
 // built-in middleware for json
 app.use(express.json());
-
+// built-in middleware to handle urlencoded form data
+app.use(express.urlencoded({ extended: true }));
 // middleware for cookies
 app.use(cookieParser());
 
@@ -49,7 +48,7 @@ app.use("/", express.static(path.join(__dirname, "/public")));
 app.use("/", require("./routes/root"));
 // Handle Login Route
 app.use("/auth", require("./routes/auth"));
-app.use("/register", require("./routes/register"));
+app.use("/auth", require("./routes/register"));
 app.use("/refresh", require("./routes/refresh"));
 app.use("/logout", require("./routes/logout"));
 app.use("/api/loginhistories", require("./routes/loginhistoryRoute"));

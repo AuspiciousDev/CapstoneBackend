@@ -258,6 +258,50 @@ const updateEmployeeIMG = async (req, res) => {
   res.json(update);
 };
 
+const updateEmployeeLoads = async (req, res) => {
+  if (!req?.params?.empID) {
+    return res.status(400).json({ message: "Employee ID params is required!" });
+  }
+  console.log(req.body);
+  const { empID, levelLoad, sectionLoad, subjectLoad } = req.body;
+
+  if (!empID) {
+    return res.status(400).json({ message: "Employee ID is required!" });
+  }
+  if (empID !== req?.params?.empID) {
+    return res
+      .status(400)
+      .json({ message: "Provided Employee ID and Request ID does not match!" });
+  }
+
+  const response = await Employee.findOne({ empID: req.params.empID }).exec();
+  if (!response) {
+    return res.status(204).json({ message: "Employee doesn't exists!" });
+  }
+  const empObject = {
+    empID,
+    SubjectLoads: subjectLoad.types,
+    LevelLoads: levelLoad.types,
+    SectionLoads: sectionLoad.types,
+  };
+
+  const update = await Employee.findOneAndUpdate(
+    { empID: req.params.empID },
+    {
+      $set: {
+        LevelLoads: empObject.LevelLoads,
+        SectionLoads: empObject.SectionLoads,
+        SubjectLoads: empObject.SubjectLoads,
+      },
+    }
+  );
+  console.log(update);
+  if (!update) {
+    return res.status(400).json({ error: "Employee Loads update failed!" });
+  }
+  res.json(update);
+};
+
 const deleteEmployeeByID = async (req, res) => {
   const { empID } = req.body;
   if (!empID) {
@@ -333,4 +377,5 @@ module.exports = {
   deleteEmployeeByID,
   toggleStatusById,
   updateEmployeeIMG,
+  updateEmployeeLoads,
 };
