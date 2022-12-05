@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../helper/sendMail");
 const createToken = require("../helper/createToken");
-
 const registerUserController = {
   createNewUser: async (req, res) => {
     // Retrieve data
@@ -22,9 +21,9 @@ const registerUserController = {
       if (password.length < 8)
         return res
           .status(400)
-          .json({ msg: "Password must be at least 8 characters." });
+          .json({ message: "Password must be at least 8 characters." });
 
-      const duplicate = await User.findOne({ username, email }).lean().exec();
+      const duplicate = await User.findOne({ email }).lean().exec();
       if (duplicate) {
         return res
           .status(409)
@@ -32,7 +31,7 @@ const registerUserController = {
       }
       verifyUserExists = await Employee.findOne({
         empID: username,
-        // email: email,
+        email: email,
       })
         .lean()
         .exec();
@@ -75,7 +74,8 @@ const registerUserController = {
         userType,
       };
       const activationToken = createToken.activation(userObject);
-      const url = `http://localhost:3600/api/auth/activate/${activationToken}`;
+      console.log(process.env.BASE_URL);
+      const url = `${process.env.BASE_URL}/api/auth/activate/${activationToken}`;
       sendMail.sendEmailRegister(email, url, "Verify your email", username);
       res.status(200).json({ message: "Welcome! Please check your email." });
       console.log("userObject :", userObject);
@@ -87,7 +87,10 @@ const registerUserController = {
     try {
       //get token
       const { activation_token } = req.body;
-      console.log("🚀 ~ file: registerUserController.js:90 ~ activate: ~ activation_token", activation_token)
+      console.log(
+        "🚀 ~ file: registerUserController.js:90 ~ activate: ~ activation_token",
+        activation_token
+      );
       console.log("Activation_Token :", activation_token);
       // verify token
       const user = jwt.verify(

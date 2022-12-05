@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const createToken = require("../helper/createToken");
 const sendMail = require("../helper/sendMail");
-
 const authController = {
   handleLogin: async (req, res) => {
     try {
@@ -97,7 +96,7 @@ const authController = {
       //create access token
       const accessToken = createToken.access({ username: user.username });
       //send email
-      const url = `http://localhost:3600/auth/forgot-password/${accessToken}`;
+      const url = `${process.env.BASE_URL}/auth/forgot-password/${accessToken}`;
       const name = user.username;
       sendMail.sendEmailReset(email, url, "Reset your password", name);
 

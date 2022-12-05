@@ -217,7 +217,7 @@ const sendEmailRegister = (to, url, text, username) => {
                         <tr>
                             <td bgcolor="#FFECD1" align="center" style="padding: 30px 30px 30px 30px; border-radius: 4px 4px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
                                 <h2 style="font-size: 20px; font-weight: 400; color: #111111; margin: 0;">Need more help?</h2>
-                                <p style="margin: 0;"><a href="http://localhost:3600/" target="_blank" style="color: #01579b;">We&rsquo;re here to help you out</a></p>
+                                <p style="margin: 0;"><a href="${process.env.BASE_URL}" target="_blank" style="color: #01579b;">We&rsquo;re here to help you out</a></p>
                             </td>
                         </tr>
                     </table>  
@@ -641,7 +641,7 @@ const sendEmailReset = (to, url, text, name) => {
                     </h2>
                     <p style="margin: 0">
                       <a
-                        href="http://localhost:3600/"
+                        href="${process.env.BASE_URL}"
                         target="_blank"
                         style="color: #01579b"
                         >We&rsquo;re here to help you out</a
