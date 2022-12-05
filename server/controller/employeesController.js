@@ -1,101 +1,111 @@
 const Employee = require("../model/Employee");
+const Student = require("../model/Student");
 const User = require("../model/User");
 const Grade = require("../model/Grade");
 const TaskScore = require("../model/TaskScore");
 const Task = require("../model/Task");
 
 const createNewEmployee = async (req, res) => {
-  const {
-    empID,
-    empType,
-    SubjectLoads,
-    LevelLoads,
-    SectionLoads,
-    active,
-    firstName,
-    middleName,
-    lastName,
-    suffix,
-    dateOfBirth,
-    placeOfBirth,
-    gender,
-    civilStatus,
-    nationality,
-    religion,
-    address,
-    city,
-    province,
-    email,
-    mobile,
-    telephone,
-    emergencyName,
-    emergencyRelationship,
-    emergencyNumber,
-  } = req.body;
-  console.log(empID);
-
-  // if (!Number(req.body.empID))
-  //   return res
-  //     .status(409)
-  //     .json({ message: `[${empID}] is not a valid Employee ID` });
-  // if (!Number(mobile))
-  //   return res
-  //     .status(409)
-  //     .json({ message: `[${contactNumber}] is not a valid Contact Number` });
-
-  const duplicate = await Employee.findOne({ empID }).exec();
-  if (duplicate) return res.status(409).json({ message: "Duplicate Employee" });
-
-  const duplicateEmail = await Employee.findOne({ email }).exec();
-  if (duplicateEmail)
-    return res.status(409).json({ message: "Duplicate Email" });
-  const empObject = {
-    empID,
-    empType: empType.types,
-    SubjectLoads,
-    LevelLoads,
-    SectionLoads,
-    active,
-    firstName,
-    middleName,
-    lastName,
-    suffix,
-    dateOfBirth,
-    placeOfBirth,
-    gender,
-    civilStatus,
-    nationality,
-    religion,
-    address,
-    city,
-    province,
-    email,
-    mobile,
-    telephone,
-    emergencyName,
-    emergencyRelationship,
-    emergencyNumber,
-  };
-  console.log(empObject);
   try {
+    const {
+      empID,
+      empType,
+      SubjectLoads,
+      LevelLoads,
+      SectionLoads,
+      active,
+      firstName,
+      middleName,
+      lastName,
+      suffix,
+      dateOfBirth,
+      placeOfBirth,
+      gender,
+      civilStatus,
+      nationality,
+      religion,
+      address,
+      city,
+      province,
+      email,
+      mobile,
+      telephone,
+      emergencyName,
+      emergencyRelationship,
+      emergencyNumber,
+    } = req.body;
+    console.log(empID);
+
+    // if (!Number(req.body.empID))
+    //   return res
+    //     .status(409)
+    //     .json({ message: `[${empID}] is not a valid Employee ID` });
+    // if (!Number(mobile))
+    //   return res
+    //     .status(409)
+    //     .json({ message: `[${contactNumber}] is not a valid Contact Number` });
+
+    const duplicate = await Employee.findOne({ empID }).exec();
+    if (duplicate)
+      return res
+        .status(409)
+        .json({ message: "Duplicate Username for Employee" });
+    const checkStud = await Student.findOne({ empID }).exec();
+    if (duplicate)
+      return res
+        .status(409)
+        .json({ message: "Username already exists in Students" });
+
+    // const duplicateEmail = await Employee.findOne({ email }).exec();
+    // if (duplicateEmail)
+    const empObject = {
+      empID,
+      empType: empType.types,
+      SubjectLoads,
+      LevelLoads,
+      SectionLoads,
+      active,
+      firstName,
+      middleName,
+      lastName,
+      suffix,
+      dateOfBirth,
+      placeOfBirth,
+      gender,
+      civilStatus,
+      nationality,
+      religion,
+      address,
+      city,
+      province,
+      email,
+      mobile,
+      telephone,
+      emergencyName,
+      emergencyRelationship,
+      emergencyNumber,
+    };
+    console.log(empObject);
+
     const empObjectRes = await Employee.create(empObject);
     if (!empObjectRes)
       return res.status(400).json({ message: "Cannot create employee!" });
     console.log(empObjectRes);
     res.status(201).json(empObjectRes);
+
+    // const empObject = { empID, firstName, lastName };
+    // const userObject = { username: empID, password: hashedPassword };
+    // try {
+    //   const empObjectRes = await Employee.create(empObject);
+    //   const userObjectRes = await User.create(userObject);
+    //   res.status(201).json({ empObjectRes, userObjectRes });
+    // } catch (error) {
+    //   console.error(error);
+    // }
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: error.message });
   }
-
-  // const empObject = { empID, firstName, lastName };
-  // const userObject = { username: empID, password: hashedPassword };
-  // try {
-  //   const empObjectRes = await Employee.create(empObject);
-  //   const userObjectRes = await User.create(userObject);
-  //   res.status(201).json({ empObjectRes, userObjectRes });
-  // } catch (error) {
-  //   console.error(error);
-  // }
 };
 
 const getAllEmployees = async (req, res) => {

@@ -256,7 +256,7 @@ const sendEmailReset = (to, url, text, name) => {
   const mailOptions = {
     from: ADMIN_EMAIL,
     to: to,
-    subject: "RESET PASSWORD",
+    subject: "RESET YOUR PASSWORD",
     html: `<!DOCTYPE html>
     <html>
       <head>
@@ -596,7 +596,7 @@ const sendEmailReset = (to, url, text, name) => {
                       line-height: 25px;
                     "
                   >
-                    <p style="margin: 0">Cheers,<br />BBB Team</p>
+                    <p style="margin: 0">Cheers,<br />AusDev</p>
                   </td>
                 </tr>
               </table>

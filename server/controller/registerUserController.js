@@ -77,16 +77,17 @@ const registerUserController = {
       const activationToken = createToken.activation(userObject);
       const url = `http://localhost:3600/api/auth/activate/${activationToken}`;
       sendMail.sendEmailRegister(email, url, "Verify your email", username);
-      res.status(200).json({ msg: "Welcome! Please check your email." });
+      res.status(200).json({ message: "Welcome! Please check your email." });
       console.log("userObject :", userObject);
     } catch (error) {
-      res.status(500).json({ msg: error.message });
+      res.status(500).json({ message: error.message });
     }
   },
   activate: async (req, res) => {
     try {
       //get token
       const { activation_token } = req.body;
+      console.log("🚀 ~ file: registerUserController.js:90 ~ activate: ~ activation_token", activation_token)
       console.log("Activation_Token :", activation_token);
       // verify token
       const user = jwt.verify(
@@ -114,7 +115,7 @@ const registerUserController = {
         message: "Your account has been activated!, You can now sign in!",
       });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: error.message });
     }
   },
 };
