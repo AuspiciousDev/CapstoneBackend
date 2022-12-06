@@ -31,7 +31,7 @@ const registerUserController = {
       }
       verifyUserExists = await Employee.findOne({
         empID: username,
-        email: email,
+        // email: email,
       })
         .lean()
         .exec();
@@ -44,7 +44,7 @@ const registerUserController = {
       ) {
         verifyUserExists = await Student.findOne({
           studID: username,
-          // email: email,
+          email: email,
         })
           .lean()
           .exec();

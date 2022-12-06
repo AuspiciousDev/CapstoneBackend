@@ -27,8 +27,32 @@ const createDoc = async (req, res) => {
     console.error(error);
   }
 };
+// const getAllDoc = async (req, res) => {
+//   const subject = await Subject.find();
+//   if (!subject) return res.status(204).json({ message: "No record found!" });
+//   res.status(200).json(subject);
+// };
 const getAllDoc = async (req, res) => {
-  const subject = await Subject.find();
+  const subject = await Subject.aggregate([
+    {
+      $lookup: {
+        from: "levels",
+        localField: "levelID",
+        foreignField: "levelID",
+        as: "level",
+      },
+    },
+    {
+      $unwind: {
+        path: "$level",
+      },
+    },
+    {
+      $set: {
+        levelNum: { $toInt: "$level.levelNum" },
+      },
+    },
+  ]);
   if (!subject) return res.status(204).json({ message: "No record found!" });
   res.status(200).json(subject);
 };

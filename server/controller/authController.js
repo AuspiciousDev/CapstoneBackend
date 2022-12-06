@@ -132,5 +132,36 @@ const authController = {
       res.status(500).json({ message: error.message });
     }
   },
+  changePassword: async (req, res) => {
+    try {
+      const { username, password, newPassword } = req.body;
+      if (!username || !password || !newPassword)
+        res.status(400).json({ message: "Incomplete Fields" });
+
+      const foundUser = await User.findOne({ username }).exec();
+      if (!foundUser)
+        return res.status(404).json({ message: "Invalid Username/Password!" }); //Unauth
+      // return res.status(401).json({ message: "Username not found" }); //Unauth
+      const match = await bcrypt.compare(password, foundUser.password);
+      if (match) {
+        const salt = await bcrypt.genSalt();
+        const hashPassword = await bcrypt.hash(newPassword, salt);
+
+        await User.findOneAndUpdate(
+          {
+            username: username,
+          },
+          {
+            password: hashPassword,
+          }
+        );
+        res.status(200).json({ message: "Password changed successfully!" });
+      } else {
+        res.status(400).json({ message: "Invalid Username/Password!" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
 module.exports = authController;

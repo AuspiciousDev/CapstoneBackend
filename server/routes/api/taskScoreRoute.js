@@ -4,5 +4,6 @@ const taskScoreController = require("../../controller/taskScoreController");
 
 router.get("/", taskScoreController.getAllDoc);
 router.post("/register", taskScoreController.createDoc);
+router.delete("/delete", taskScoreController.deleteByDocID);
 
 module.exports = router;

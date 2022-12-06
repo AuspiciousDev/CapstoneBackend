@@ -329,20 +329,20 @@ const deleteEmployeeByID = async (req, res) => {
     });
   }
   const findGrade = await Grade.find({ empID });
-  if (findGrade) {
+  if (findGrade.length > 0) {
     return res.status(400).json({
       message: `Cannot delete ${empID}, A records currently exists with ${empID} in Grades. To delete the record, Remove all records that contains ${empID} `,
     });
   }
 
   const findTask = await Task.find({ empID });
-  if (findTask) {
+  if (findTask.length > 0) {
     return res.status(400).json({
       message: `Cannot delete ${empID}, A records currently exists with ${empID} in Tasks. To delete the record, Remove all records that contains ${empID} `,
     });
   }
   const findTaskScore = await TaskScore.find({ empID });
-  if (findTaskScore) {
+  if (findTaskScore.length > 0) {
     return res.status(400).json({
       message: `Cannot delete ${empID}, A records currently exists with ${empID} in Scores. To delete the record, Remove all records that contains ${empID} `,
     });

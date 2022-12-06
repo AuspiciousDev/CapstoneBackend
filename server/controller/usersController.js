@@ -64,6 +64,9 @@ const getDocEmployee = async (req, res) => {
         middleName: {
           $toString: "$profile.middleName",
         },
+        gender: {
+          $toString: "$profile.gender",
+        },
       },
     },
   ]);
@@ -101,6 +104,9 @@ const getDocStudent = async (req, res) => {
         },
         middleName: {
           $toString: "$profile.middleName",
+        },
+        gender: {
+          $toString: "$profile.gender",
         },
       },
     },
@@ -283,7 +289,7 @@ const deleteDocByID = async (req, res) => {
   if (!findID) {
     return res.status(404).json({ message: `${username} not found!` });
   }
-  const deleteItem = await findID.deleteOne({ username });
+  // const deleteItem = await findID.deleteOne({ username });
   res.status(200).json({ message: `${username} permanently deleted!` });
 };
 
@@ -374,6 +380,41 @@ const getUserProfileByID = async (req, res) => {
     }
   } catch (error) {}
 };
+const toggleStatusById = async (req, res) => {
+  try {
+    console.log("USERS Toggle :", req.body);
+    const { username, status } = req.body;
+    if (!username) {
+      return res
+        .status(400)
+        .json({ message: "Username ID required to toggle status!" });
+    }
+
+    const findID = await User.findOne({
+      username,
+    }).exec();
+    if (!findID) {
+      return res
+        .status(400)
+        .json({ message: `${username} not found in year!` });
+    }
+    const updateItem = await User.findOneAndUpdate(
+      { username: username },
+      {
+        status,
+      }
+    );
+
+    if (!updateItem) {
+      return res.status(400).json({ message: "No User" });
+    }
+    // const result = await response.save();
+    console.log("USERS update : ", updateItem);
+    res.json(updateItem);
+  } catch (error) {
+    res.status(500).json({ message: error.me });
+  }
+};
 module.exports = {
   createNewUser,
   updateUser,
@@ -384,4 +425,5 @@ module.exports = {
   getUserProfileByID,
   getDocEmployee,
   getDocStudent,
+  toggleStatusById,
 };

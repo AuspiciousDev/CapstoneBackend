@@ -10,45 +10,45 @@ const getAllDoc = async (req, res) => {
 
 const createDoc = async (req, res) => {
   // Retrieve data
-  const { schoolYearID, schoolYear, description } = req.body;
+  try {
+    const { schoolYearID, schoolYear, description, createdBy } = req.body;
 
-  // Validate Data if given
-  if (!schoolYearID || !schoolYear) {
-    return res.status(400).json({ message: "All Fields are required!" });
-  }
-  const duplicate = await SchoolYear.findOne({
-    schoolYearID,
-  })
-    .lean()
-    .exec();
-  if (duplicate)
-    return res
-      .status(409)
-      .json({ message: `Duplicate School Year ${schoolYearID}!` });
-
-  const findActive = await SchoolYear.findOne({ status: true }).exec();
-  console.log("findActive : ", findActive);
-  if (!findActive) {
-    // Check for Duplicate Data
-
-    // Create Object
-    const docObject = { schoolYearID, schoolYear, description };
-
-    try {
-      const response = await SchoolYear.create(docObject);
-      res.status(201).json(response);
-    } catch (error) {
-      console.error(error);
+    // Validate Data if given
+    if (!schoolYearID || !schoolYear || !createdBy) {
+      return res.status(400).json({ message: "All Fields are required!" });
     }
-  } else {
-    return (
-      res.status(400).json({
-        message: `School Year ${findActive.schoolYearID} is still active!`,
-      }),
-      console.log(
-        `School Year : School Year ${findActive.schoolYearID} is still active!`
-      )
-    );
+    const duplicate = await SchoolYear.findOne({
+      schoolYearID,
+    })
+      .lean()
+      .exec();
+    if (duplicate)
+      return res
+        .status(409)
+        .json({ message: `Duplicate School Year ${schoolYearID}!` });
+
+    const findActive = await SchoolYear.findOne({ status: true }).exec();
+    console.log("findActive : ", findActive);
+    if (!findActive) {
+      // Check for Duplicate Data
+
+      // Create Object
+      const docObject = { schoolYearID, schoolYear, description, createdBy };
+
+      const response = await SchoolYear.create(docObject);
+      if (response) res.status(201).json(response);
+    } else {
+      return (
+        res.status(400).json({
+          message: `School Year ${findActive.schoolYearID} is still active!`,
+        }),
+        console.log(
+          `School Year : School Year ${findActive.schoolYearID} is still active!`
+        )
+      );
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 const getDocByID = async (req, res) => {
@@ -98,20 +98,20 @@ const updateDocByID = async (req, res) => {
 const deleteDocByID = async (req, res) => {
   const { schoolYearID } = req.body;
   if (!schoolYearID) {
-    return res.status(400).json({ message: "ID required!" });
+    return res.status(400).json({ message: "School ID is required!" });
   }
   const findID = await SchoolYear.findOne({ schoolYearID }).exec();
   if (!findID) {
     return res.status(400).json({ message: `${schoolYearID} not found!` });
   }
   const findGrade = await Grade.find({ schoolYearID });
-  if (findGrade) {
+  if (findGrade.length > 0) {
     return res.status(400).json({
       message: `Cannot delete year ${schoolYearID}, A records currently exists with year ${schoolYearID}. To delete the record, Remove all records that contains ${schoolYearID} `,
     });
   }
   const findEnrolled = await Enrolled.find({ schoolYearID });
-  if (findEnrolled) {
+  if (findEnrolled.length > 0) {
     return res.status(400).json({
       message: `Cannot delete year ${schoolYearID}, A records currently exists with year ${schoolYearID}. To delete the record, Remove all records that contains ${schoolYearID} `,
     });
@@ -150,7 +150,7 @@ const toggleStatusById = async (req, res) => {
       );
       //const result = await response.save();
       if (status === false) {
-        const updateLev = await ActiveStudent.updateMany(
+        const updateLev = await Enrolled.updateMany(
           { schoolYearID: { $in: schoolYearID.toLowerCase() } },
           { $set: { status: status } }
         );

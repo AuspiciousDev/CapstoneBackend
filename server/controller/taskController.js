@@ -8,6 +8,7 @@ const createDoc = async (req, res) => {
     taskType,
     subjectID,
     levelID,
+    sectionID,
     maxPoints,
     empID,
     description,
@@ -21,6 +22,7 @@ const createDoc = async (req, res) => {
     !taskType ||
     !subjectID ||
     !levelID ||
+    !sectionID ||
     !maxPoints ||
     !empID ||
     !schoolYearID
@@ -40,6 +42,7 @@ const createDoc = async (req, res) => {
     taskName,
     subjectID,
     levelID,
+    sectionID,
     schoolYearID,
     maxPoints,
     empID,

@@ -2,8 +2,51 @@ const Enrolled = require("../model/Enrolled");
 const Student = require("../model/Student");
 const Grade = require("../model/Grade");
 const TaskScore = require("../model/TaskScore");
+// const getAllDoc = async (req, res) => {
+//   const doc = await Enrolled.find().sort({ createdAt: -1 }).lean();
+//   if (!doc) return res.status(204).json({ message: "No Data Found!" });
+//   res.status(200).json(doc);
+// };
 const getAllDoc = async (req, res) => {
-  const doc = await Enrolled.find().sort({ createdAt: -1 }).lean();
+  // const doc = await Enrolled.find().sort({ createdAt: -1 }).lean();
+  const doc = await Enrolled.aggregate([
+    {
+      $lookup: {
+        from: "students",
+        localField: "studID",
+        foreignField: "studID",
+        as: "result",
+      },
+    },
+    {
+      $unwind: {
+        path: "$result",
+      },
+    },
+
+    {
+      $set: {
+        imgURL: {
+          $toString: "$result.imgURL",
+        },
+        firstName: {
+          $toString: "$result.firstName",
+        },
+        middleName: {
+          $toString: "$result.middleName",
+        },
+        lastName: {
+          $toString: "$result.lastName",
+        },
+        gender: {
+          $toString: "$result.gender",
+        },
+        email: {
+          $toString: "$result.email",
+        },
+      },
+    },
+  ]);
   if (!doc) return res.status(204).json({ message: "No Data Found!" });
   res.status(200).json(doc);
 };
@@ -117,33 +160,36 @@ const getDocByID = async (req, res) => {
 };
 
 const deleteDocByID = async (req, res) => {
-  console.log("Delete Enrolled: ", req.body);
-  const { enrolledID, schoolYearID } = req.body;
-  if (!enrolledID || !schoolYearID) {
-    return res.status(400).json({ message: "ID required!" });
-  }
-  const findID = await Enrolled.findOne({ enrolledID }).exec();
-  console.log("Enrolled FindID: ", findID);
-  if (!findID) {
-    return res.status(400).json({ message: `${enrolledID} not found!` });
-  }
-  const findGrade = await Grade.findOne({ enrolledID }).exec();
-  console.log("Enrolled FindGrade: ", findGrade);
-  console.log("Enrolled FindGrade1: ", findID.studID);
-  if (findGrade) {
-    return res.status(400).json({
-      message: `Cannot delete ${findID.studID} in Enrolled, A record/s currently exists with ${findID.studID} in Grades. To delete the record, Remove all records that contains ${findID.studID} and try again.`,
-    });
-  }
-  const findTask = await TaskScore.findOne({ studID, schoolYearID }).exec();
+  try {
+    console.log("Delete Enrolled: ", req.body);
+    const { enrolledID, schoolYearID, studID } = req.body;
+    if (!enrolledID || !schoolYearID || !studID) {
+      return res.status(400).json({ message: "ID required!" });
+    }
+    const findID = await Enrolled.findOne({ enrolledID }).exec();
+    console.log("Enrolled FindID: ", findID);
+    if (!findID) {
+      return res.status(400).json({ message: `${enrolledID} not found!` });
+    }
+    const findGrade = await Grade.findOne({ enrolledID }).exec();
+    console.log("Enrolled FindGrade: ", findGrade);
+    if (findGrade) {
+      return res.status(400).json({
+        message: `Cannot delete ${findID.studID} in Enrolled, A record/s currently exists with ${findID.studID} in Grades. To delete the record, Remove all records that contains ${findID.studID} and try again.`,
+      });
+    }
+    const findTask = await TaskScore.findOne({ studID, schoolYearID }).exec();
 
-  if (findTask) {
-    return res.status(400).json({
-      message: `Cannot delete ${findID.studID} in Enrolled, A record/s currently exists with ${findID.studID} in Tasks. To delete the record, Remove all records that contains ${findID.studID} and try again.`,
-    });
+    if (findTask) {
+      return res.status(400).json({
+        message: `Cannot delete ${findID.studID} in Enrolled, A record/s currently exists with ${findID.studID} in Tasks. To delete the record, Remove all records that contains ${findID.studID} and try again.`,
+      });
+    }
+    const deleteItem = await findID.deleteOne({ enrolledID });
+    res.status(201).json(deleteItem);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-  const deleteItem = await findID.deleteOne({ enrolledID });
-  res.status(201).json(deleteItem);
 };
 const toggleStatusById = async (req, res) => {
   console.log("Enrolled Toggle :", req.body);

@@ -19,8 +19,11 @@ const getAllDoc = async (req, res) => {
     },
     {
       $set: {
-        depName: {
+        levelNum: {
           $toString: "$result.levelNum",
+        },
+        departmentID: {
+          $toString: "$result.departmentID",
         },
         lvlStatus: {
           $toBool: "$result.status",

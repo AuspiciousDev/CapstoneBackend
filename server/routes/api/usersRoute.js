@@ -12,5 +12,5 @@ router.get("/students", usersController.getDocStudent);
 
 router.post("/register", usersController.createNewUser);
 router.delete("/delete", usersController.deleteDocByID);
-
+router.patch("/status", usersController.toggleStatusById);
 module.exports = router;

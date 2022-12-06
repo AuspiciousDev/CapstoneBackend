@@ -1,3 +1,4 @@
+const Task = require("../model/Task");
 const TaskScore = require("../model/TaskScore");
 
 const createDoc = async (req, res) => {
@@ -73,7 +74,25 @@ const getAllDoc = async (req, res) => {
   if (!task) return res.status(204).json({ message: "No record found!" });
   res.status(200).json(task);
 };
+const deleteByDocID = async (req, res) => {
+  try {
+    const { taskScoreID } = req.body;
+    if (!taskScoreID) {
+      return res.status(400).json({ message: "Task ID required!" });
+    }
+    const findID = await TaskScore.findOne({ taskScoreID }).exec();
+    if (!findID) {
+      return res.status(400).json({ message: `${taskScoreID} not found!` });
+    }
+
+    const deleteItem = await findID.deleteOne({ taskScoreID });
+    res.status(200).json(deleteItem);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
   createDoc,
   getAllDoc,
+  deleteByDocID,
 };

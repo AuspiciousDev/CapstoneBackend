@@ -21,6 +21,14 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    levelID: {
+      type: String,
+      required: true,
+    },
+    sectionID: {
+      type: String,
+      required: true,
+    },
     subjectID: {
       type: String,
       required: true,

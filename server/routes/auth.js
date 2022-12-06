@@ -6,5 +6,6 @@ router.post("/", authController.handleLogin);
 router.post("/verify", authController.verifyPassword);
 router.post("/forgot-password", authController.forgotPassword);
 router.post("/reset-password", auth, authController.resetPassword);
+router.post("/change-password", auth, authController.changePassword);
 
 module.exports = router;
