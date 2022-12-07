@@ -257,42 +257,50 @@ const toggleStatusById = async (req, res) => {
 };
 
 const updateIMG = async (req, res) => {
-  if (!req?.params?.studID) {
-    return res.status(400).json({ message: "Student ID params is required!" });
-  }
-
-  const { studID, imgURL } = req.body;
-  console.log(req.body);
-  console.log(imgURL);
-  if (!imgURL) {
-    return console.log("wala iamge");
-  }
-  if (!imgURL) {
-    return res.status(400).json({ message: "Image URL is required!" });
-  }
-  const response = await Student.findOne({ imgURL: req.params.imgURL }).exec();
-
-  if (!response) {
-    return res.status(204).json({ message: "Student doesn't exists!" });
-  }
-
-  const empObject = {
-    studID,
-    imgURL,
-  };
-  console.log(empObject.imgURL);
-  const update = await Student.findOneAndUpdate(
-    { imgURL: req.params.imgURL },
-    {
-      $set: { imgURL: empObject.imgURL },
+  try {
+    if (!req?.params?.studID) {
+      return res
+        .status(400)
+        .json({ message: "Student ID params is required!" });
     }
-  );
-  console.log(update);
-  if (!update) {
-    return res.status(400).json({ error: "No Student" });
+
+    const { studID, imgURL } = req.body;
+    console.log(req.body);
+    console.log(imgURL);
+    if (!imgURL) {
+      return console.log("wala iamge");
+    }
+    if (!imgURL) {
+      return res.status(400).json({ message: "Image URL is required!" });
+    }
+    const response = await Student.findOne({
+      studID: req.params.studID,
+    }).exec();
+
+    if (!response) {
+      return res.status(204).json({ message: "Student doesn't exists!" });
+    }
+
+    const empObject = {
+      studID,
+      imgURL,
+    };
+    console.log(empObject.imgURL);
+    const update = await Student.findOneAndUpdate(
+      { studID: req.params.studID },
+      {
+        $set: { imgURL: empObject.imgURL },
+      }
+    );
+    console.log(update);
+    if (!update) {
+      return res.status(400).json({ error: "No Student" });
+    }
+    //const result = await response.save();
+    res.json(update);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-  //const result = await response.save();
-  res.json(update);
 };
 module.exports = {
   createNewStudent,
