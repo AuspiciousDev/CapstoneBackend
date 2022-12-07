@@ -115,16 +115,20 @@ const getAllEmployees = async (req, res) => {
 };
 
 const getEmployeeByID = async (req, res) => {
-  if (!req?.params?.empID) {
-    return res.status(400).json({ message: "Employee ID is required!" });
+  try {
+    if (!req?.params?.empID) {
+      return res.status(400).json({ message: "Employee ID is required!" });
+    }
+    const employee = await Employee.findOne({ empID: req.params.empID }).exec();
+    if (!employee) {
+      return res
+        .status(400)
+        .json({ message: `Employee ID ${req.params.empID} not found` });
+    }
+    res.json(employee);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-  const employee = await Employee.findOne({ empID: req.params.empID }).exec();
-  if (!employee) {
-    return res
-      .status(400)
-      .json({ message: `Employee ID ${req.params.empID} not found` });
-  }
-  res.json(employee);
 };
 
 const updateEmployeeByID = async (req, res) => {
