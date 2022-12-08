@@ -23,11 +23,17 @@ const registerUserController = {
           .status(400)
           .json({ message: "Password must be at least 8 characters." });
 
-      const duplicate = await User.findOne({ email }).lean().exec();
-      if (duplicate) {
+      const duplicateUser = await User.findOne({ username }).lean().exec();
+      if (duplicateUser) {
         return res
           .status(409)
-          .json({ message: "Username/email already registered!" });
+          .json({ message: "Username already registered!" });
+      }
+      const duplicateEmail = await User.findOne({ email }).lean().exec();
+      if (duplicateEmail) {
+        return res
+          .status(409)
+          .json({ message: "Username already registered!" });
       }
       verifyUserExists = await Employee.findOne({
         empID: username,
@@ -75,8 +81,13 @@ const registerUserController = {
       };
       const activationToken = createToken.activation(userObject);
       console.log(process.env.BASE_URL);
-      const url = `${process.env.BASE_URL}/api/auth/activate/${activationToken}`;
-      sendMail.sendEmailRegister(email, url, `Verify your email {debug check}`, username);
+      const url = `${process.env.BASE_URL}api/auth/activate/${activationToken}`;
+      sendMail.sendEmailRegister(
+        email,
+        url,
+        `Verify your email {debug check}`,
+        username
+      );
       res.status(200).json({ message: "Welcome! Please check your email." });
       console.log("userObject :", userObject);
     } catch (error) {

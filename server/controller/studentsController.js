@@ -2,6 +2,7 @@ const Student = require("../model/Student");
 const User = require("../model/User");
 const Grade = require("../model/Grade");
 const Enrolled = require("../model/Enrolled");
+const Employee = require("../model/Employee");
 
 const createNewStudent = async (req, res) => {
   console.log("New Student :", req.body);
@@ -51,6 +52,11 @@ const createNewStudent = async (req, res) => {
 
   const duplicate = await Student.findOne({ studID }).exec();
   if (duplicate) return res.status(409).json({ message: "Duplicate Student" });
+  const checkEmp = await Employee.findOne({ studID }).exec();
+  if (checkEmp)
+    return res.status(409).json({
+      message: `Student ID ${studID} already exist in Employee records.`,
+    });
   const empObject = {
     studID,
     LRN,

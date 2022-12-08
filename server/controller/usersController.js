@@ -33,6 +33,15 @@ const getAllUsers = async (req, res) => {
   if (!users) return res.status(204).json({ message: "No Users Found!" });
   res.status(200).json(users);
 };
+const getAllUsers_Username = async (req, res) => {
+  try {
+    const users = await User.find().select("username").exec();
+    if (!users) return res.status(204).json({ message: "No Users Found!" });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 const getDocEmployee = async (req, res) => {
   const users = await User.aggregate([
     {
@@ -67,6 +76,11 @@ const getDocEmployee = async (req, res) => {
         gender: {
           $toString: "$profile.gender",
         },
+      },
+    },
+    {
+      $project: {
+        password: 0,
       },
     },
   ]);
@@ -427,4 +441,5 @@ module.exports = {
   getDocEmployee,
   getDocStudent,
   toggleStatusById,
+  getAllUsers_Username,
 };
