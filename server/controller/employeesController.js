@@ -50,7 +50,7 @@ const createNewEmployee = async (req, res) => {
       return res
         .status(409)
         .json({ message: "Duplicate Username for Employee" });
-    const checkStud = await Student.findOne({ empID }).exec();
+    const checkStud = await Student.findOne({ studID: empID }).exec();
     if (checkStud)
       return res.status(409).json({
         message: `Employee ID ${empID} already exist in Student records.`,

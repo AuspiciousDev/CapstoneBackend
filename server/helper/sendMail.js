@@ -20,14 +20,20 @@ const sendEmailRegister = (to, url, text, username) => {
   });
   const accessToken = oauth2client.getAccessToken();
   const smtpTransport = nodemailer.createTransport({
-    service: "gmail",
+    // service: "gmail",
+    // auth: {
+    //   type: "OAuth2",
+    //   user: ADMIN_EMAIL,
+    //   clientId: G_CLIENT_ID,
+    //   clientSecret: G_CLIENT_SECRET,
+    //   refreshToken: G_REFRESH_TOKEN,
+    //   accessToken,
+    host: "smtp.hostinger.com",
+    port: 465,
+    secure: true, // upgrade later with STARTTLS
     auth: {
-      type: "OAuth2",
-      user: ADMIN_EMAIL,
-      clientId: G_CLIENT_ID,
-      clientSecret: G_CLIENT_SECRET,
-      refreshToken: G_REFRESH_TOKEN,
-      accessToken,
+      user: "aus.studentportal@aus-portal.online",
+      pass: "P@$$WoRD12",
     },
   });
 
@@ -242,14 +248,21 @@ const sendEmailReset = (to, url, text, name) => {
   });
   const accessToken = oauth2client.getAccessToken();
   const smtpTransport = nodemailer.createTransport({
-    service: "gmail",
+    // service: "gmail",
+    // auth: {
+    //   type: "OAuth2",
+    //   user: ADMIN_EMAIL,
+
+    //   clientId: G_CLIENT_ID,
+    //   clientSecret: G_CLIENT_SECRET,
+    //   refreshToken: G_REFRESH_TOKEN,
+    //   accessToken,
+    host: "smtp.hostinger.com",
+    port: 465,
+    secure: true, // upgrade later with STARTTLS
     auth: {
-      type: "OAuth2",
-      user: ADMIN_EMAIL,
-      clientId: G_CLIENT_ID,
-      clientSecret: G_CLIENT_SECRET,
-      refreshToken: G_REFRESH_TOKEN,
-      accessToken,
+      user: "aus.studentportal@aus-portal.online",
+      pass: "P@$$WoRD12",
     },
   });
 
@@ -473,7 +486,7 @@ const sendEmailReset = (to, url, text, name) => {
                     "
                   >
                     <p style="margin: 0">
-                      We're excited to hel you recover your account. Just press the
+                      We're excited to help you recover your account. Just press the
                       button below to reset your password.
                     </p>
                   </td>
@@ -658,9 +671,11 @@ const sendEmailReset = (to, url, text, name) => {
     `,
   };
 
-  smtpTransport.sendMail(mailOptions, (err, info) => {
-    if (err) return { err };
-    return info;
+  smtpTransport.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log(error);
+    }
+    console.log("Message %s sent: %s", info.messageId, info.response);
   });
 };
 

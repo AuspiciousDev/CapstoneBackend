@@ -5,88 +5,85 @@ const Enrolled = require("../model/Enrolled");
 const Employee = require("../model/Employee");
 
 const createNewStudent = async (req, res) => {
-  console.log("New Student :", req.body);
-  const {
-    studID,
-    LRN,
-    firstName,
-    middleName,
-    lastName,
-    suffix,
-    dateOfBirth,
-    placeOfBirth,
-    gender,
-    civilStatus,
-    nationality,
-    religion,
-    address,
-    city,
-    province,
-    mobile,
-    telephone,
-    emergencyName,
-    emergencyRelationship,
-    emergencyNumber,
-  } = req.body;
-
-  console.log(studID);
-  if (
-    !studID ||
-    !LRN ||
-    !firstName ||
-    !lastName ||
-    !dateOfBirth ||
-    !gender ||
-    !email
-  ) {
-    return res.status(400).json({ message: "Incomplete details!" });
-  }
-  // if (!Number(studID))
-  //   return res
-  //     .status(409)
-  //     .json({ message: `[${studID}] is not a valid Employee ID` });
-  // if (!Number(contactNumber))
-  //   return res
-  //     .status(409)
-  //     .json({ message: `[${contactNumber}] is not a valid Contact Number` });
-
-  const duplicate = await Student.findOne({ studID }).exec();
-  if (duplicate) return res.status(409).json({ message: "Duplicate Student" });
-  const checkEmp = await Employee.findOne({ studID }).exec();
-  if (checkEmp)
-    return res.status(409).json({
-      message: `Student ID ${studID} already exist in Employee records.`,
-    });
-  const empObject = {
-    studID,
-    LRN,
-    firstName,
-    middleName,
-    lastName,
-    suffix,
-    dateOfBirth,
-    placeOfBirth,
-    gender,
-    civilStatus,
-    nationality,
-    religion,
-    address,
-    city,
-    province,
-    mobile,
-    telephone,
-    emergencyName,
-    emergencyRelationship,
-    emergencyNumber,
-  };
   try {
+    console.log("New Student :", req.body);
+    const {
+      studID,
+      LRN,
+      firstName,
+      middleName,
+      lastName,
+      suffix,
+      dateOfBirth,
+      placeOfBirth,
+      gender,
+      civilStatus,
+      nationality,
+      religion,
+      address,
+      city,
+      province,
+      mobile,
+      telephone,
+      emergencyName,
+      emergencyRelationship,
+      emergencyNumber,
+    } = req.body;
+
+    console.log(studID);
+    if (!studID || !LRN || !firstName || !lastName || !dateOfBirth || !gender) {
+      return res.status(400).json({ message: "Incomplete details!" });
+    }
+    // if (!Number(studID))
+    //   return res
+    //     .status(409)
+    //     .json({ message: `[${studID}] is not a valid Employee ID` });
+    // if (!Number(contactNumber))
+    //   return res
+    //     .status(409)
+    //     .json({ message: `[${contactNumber}] is not a valid Contact Number` });
+
+    const duplicate = await Student.findOne({ studID }).exec();
+    if (duplicate)
+      return res.status(409).json({ message: "Duplicate Student" });
+
+    const checkEmp = await Employee.findOne({ empID: studID }).exec();
+    console.log(checkEmp);
+    if (checkEmp)
+      return res.status(409).json({
+        message: `Student ID ${studID} already exist in Employee records.`,
+      });
+    const empObject = {
+      studID,
+      LRN,
+      firstName,
+      middleName,
+      lastName,
+      suffix,
+      dateOfBirth,
+      placeOfBirth,
+      gender,
+      civilStatus,
+      nationality,
+      religion,
+      address,
+      city,
+      province,
+      mobile,
+      telephone,
+      emergencyName,
+      emergencyRelationship,
+      emergencyNumber,
+    };
+
     const empObjectRes = await Student.create(empObject);
     if (!empObjectRes)
       return res.status(400).json({ message: "Cannot create student!" });
     console.log(empObjectRes);
     res.status(201).json(empObjectRes);
   } catch (error) {
-    console.error(error);
+    res.status(500).json({ message: error.message });
+    console.log(error);
   }
 };
 const getAllStudents = async (req, res) => {

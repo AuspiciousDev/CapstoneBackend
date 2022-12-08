@@ -96,6 +96,8 @@ const authController = {
 
       //create access token
       const accessToken = createToken.access({ username: user.username });
+      console.log("BASE URL:", process.env.BASE_URL);
+      console.log("BASE EMAIL:", process.env.ADMIN_EMAIL);
       //send email
       const url = `${process.env.BASE_URL}/#/auth/forgot-password/${accessToken}`;
       const name = user.username;
@@ -103,7 +105,7 @@ const authController = {
 
       //success
       res.status(200).json({
-        message: "Password reset token has been sent, Please check your email.",
+        message: "Password reset token has been sent, Please check your inbox or spam email.",
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -118,6 +120,20 @@ const authController = {
       const salt = await bcrypt.genSalt();
       const hashPassword = await bcrypt.hash(password, salt);
       //update password
+      const foundUser = await User.findOne({
+        username: req.user.username,
+      }).exec();
+      if (!foundUser)
+        return res.status(404).json({ message: "Invalid Username/Password!" }); //Unauth
+      // return res.status(401).json({ message: "Username not found" }); //Unauth
+      const compareOldNew = await bcrypt.compare(
+        password,
+        foundUser.password
+      );
+      if (compareOldNew)
+        return res.status(400).json({
+          message: `Current and New password is just the same!, Use a new password instead.`,
+        });
       await User.findOneAndUpdate(
         {
           username: req.user.username,
@@ -150,7 +166,7 @@ const authController = {
       );
       if (compareOldNew)
         return res.status(400).json({
-          message: `Current and New password is just the same!, Use a new password instead.`,
+          message: `Current and new password is just the same!, Use a different password instead.`,
         });
       const match = await bcrypt.compare(password, foundUser.password);
       if (match) {
