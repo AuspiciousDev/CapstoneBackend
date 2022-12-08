@@ -76,11 +76,12 @@ const registerUserController = {
       const activationToken = createToken.activation(userObject);
       console.log(process.env.BASE_URL);
       const url = `${process.env.BASE_URL}/api/auth/activate/${activationToken}`;
-      sendMail.sendEmailRegister(email, url, `Verify your email debug:${process.env.BASE_URL}`, username);
+      sendMail.sendEmailRegister(email, url, `Verify your email {debug check}`, username);
       res.status(200).json({ message: "Welcome! Please check your email." });
       console.log("userObject :", userObject);
     } catch (error) {
       res.status(500).json({ message: error.message });
+      console.log(error);
     }
   },
   activate: async (req, res) => {
@@ -119,6 +120,7 @@ const registerUserController = {
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
+      console.log(error);
     }
   },
 };

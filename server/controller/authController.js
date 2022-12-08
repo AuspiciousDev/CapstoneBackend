@@ -58,6 +58,7 @@ const authController = {
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
+      console.log(error);
     }
   },
   verifyPassword: async (req, res) => {
@@ -130,6 +131,7 @@ const authController = {
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
+      console.log(error);
     }
   },
   changePassword: async (req, res) => {
@@ -147,11 +149,9 @@ const authController = {
         foundUser.password
       );
       if (compareOldNew)
-        return res
-          .status(400)
-          .json({
-            message: `Current and New password is just the same!, Use a new password instead.`,
-          });
+        return res.status(400).json({
+          message: `Current and New password is just the same!, Use a new password instead.`,
+        });
       const match = await bcrypt.compare(password, foundUser.password);
       if (match) {
         const salt = await bcrypt.genSalt();
@@ -171,6 +171,7 @@ const authController = {
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
+      console.log(error);
     }
   },
 };
