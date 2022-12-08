@@ -81,7 +81,7 @@ const registerUserController = {
       };
       const activationToken = createToken.activation(userObject);
       console.log(process.env.BASE_URL);
-      const url = `${process.env.BASE_URL}api/auth/activate/${activationToken}`;
+      const url = `${process.env.BASE_URL}/#/api/auth/activate/${activationToken}`;
       sendMail.sendEmailRegister(
         email,
         url,
