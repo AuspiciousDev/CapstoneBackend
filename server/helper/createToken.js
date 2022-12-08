@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const createToken = {
   activation: (payload) => {
     return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET, {
-      expiresIn: "5m",
+      expiresIn: "10m",
     });
   },
   access: (payload) => {

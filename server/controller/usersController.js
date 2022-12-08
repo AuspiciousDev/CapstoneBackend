@@ -281,7 +281,7 @@ const getAllUserByRole = async (req, res) => {
 };
 const deleteDocByID = async (req, res) => {
   const { username } = req.body;
-  console.log(req.body);
+  console.log("USER_reqDELETE : ", username);
   if (!username) {
     return res.status(400).json({ message: "ID required!" });
   }
@@ -289,8 +289,9 @@ const deleteDocByID = async (req, res) => {
   if (!findID) {
     return res.status(404).json({ message: `${username} not found!` });
   }
-  // const deleteItem = await findID.deleteOne({ username });
-  res.status(200).json({ message: `${username} permanently deleted!` });
+  const deleteItem = await findID.deleteOne({ username });
+  res.json(deleteItem);
+  console.log("USER_resDELETE:", deleteItem.username);
 };
 
 const removeUserRoleByID = async (req, res) => {
