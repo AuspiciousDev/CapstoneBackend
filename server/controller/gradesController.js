@@ -32,7 +32,7 @@ const getDocByStudIDandYear = async (req, res) => {
     {
       $match: {
         studID: `${req?.params?.studID}`,
-        schoolYearID: "2023",
+        schoolYearID: `${req?.params?.year}`,
       },
     },
     {
