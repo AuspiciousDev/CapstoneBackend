@@ -294,18 +294,26 @@ const getAllUserByRole = async (req, res) => {
   }
 };
 const deleteDocByID = async (req, res) => {
-  const { username } = req.body;
-  console.log("USER_reqDELETE : ", username);
-  if (!username) {
-    return res.status(400).json({ message: "ID required!" });
+  try {
+    const { username } = req.body;
+    console.log("USER_reqDELETE : ", username);
+    if (!username) {
+      return res.status(400).json({ message: "ID required!" });
+    }
+    const findID = await User.findOne({ username }).exec();
+    if (!findID) {
+      return res.status(404).json({ message: `${username} not found!` });
+    }
+    const deleteItem = await findID.deleteOne({ username });
+    res.json(deleteItem);
+    console.log("USER_resDELETE:", deleteItem);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log(
+      "🚀 ~ file: usersController.js:311 ~ deleteDocByID ~ error",
+      error
+    );
   }
-  const findID = await User.findOne({ username }).exec();
-  if (!findID) {
-    return res.status(404).json({ message: `${username} not found!` });
-  }
-  const deleteItem = await findID.deleteOne({ username });
-  res.json(deleteItem);
-  console.log("USER_resDELETE:", deleteItem.username);
 };
 
 const removeUserRoleByID = async (req, res) => {

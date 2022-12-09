@@ -11,10 +11,6 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    LRN: {
-      type: String,
-      required: true,
-    },
     status: {
       type: Boolean,
       default: true,

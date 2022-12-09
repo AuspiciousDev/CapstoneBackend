@@ -1,7 +1,8 @@
 const SchoolYear = require("../model/SchoolYear");
 const Enrolled = require("../model/Enrolled");
 const Grade = require("../model/Grade");
-
+const Task = require("../model/Task");
+const TaskScore = require("../model/TaskScore");
 const getAllDoc = async (req, res) => {
   const doc = await SchoolYear.find().sort({ schoolYearID: -1 }).lean();
   if (!doc) return res.status(204).json({ message: "No Data Found!" });
@@ -63,13 +64,17 @@ const getDocByID = async (req, res) => {
   res.json(findID);
 };
 const getDocActive = async (req, res) => {
-  const findID = await SchoolYear.findOne({ status: true }).exec();
-  if (!findID) {
-    return res
-      .status(400)
-      .json({ message: ` No Active School Year not found!` });
+  try {
+    const findID = await SchoolYear.findOne({ status: true }).exec();
+    if (!findID) {
+      return res
+        .status(400)
+        .json({ message: ` No Active School Year not found!` });
+    }
+    res.json(findID);
+  } catch (error) {
+    req.status(500).json({ message: error.message });
   }
-  res.status(200).json(findID);
 };
 const updateDocByID = async (req, res) => {
   const { schoolYearID } = req.body;
@@ -96,79 +101,93 @@ const updateDocByID = async (req, res) => {
 };
 
 const deleteDocByID = async (req, res) => {
-  const { schoolYearID } = req.body;
-  if (!schoolYearID) {
-    return res.status(400).json({ message: "School ID is required!" });
-  }
-  const findID = await SchoolYear.findOne({ schoolYearID }).exec();
-  if (!findID) {
-    return res.status(400).json({ message: `${schoolYearID} not found!` });
-  }
-  const findGrade = await Grade.find({ schoolYearID });
-  if (findGrade.length > 0) {
-    return res.status(400).json({
-      message: `Cannot delete year ${schoolYearID}, A records currently exists with year ${schoolYearID}. To delete the record, Remove all records that contains ${schoolYearID} `,
-    });
-  }
-  const findEnrolled = await Enrolled.find({ schoolYearID });
-  if (findEnrolled.length > 0) {
-    return res.status(400).json({
-      message: `Cannot delete year ${schoolYearID}, A records currently exists with year ${schoolYearID}. To delete the record, Remove all records that contains ${schoolYearID} `,
-    });
-  }
+  try {
+    const { schoolYearID } = req.body;
+    if (!schoolYearID) {
+      return res.status(400).json({ message: "School ID is required!" });
+    }
+    const findID = await SchoolYear.findOne({ schoolYearID }).exec();
+    if (!findID) {
+      return res.status(400).json({ message: `${schoolYearID} not found!` });
+    }
 
-  const deleteItem = await findID.deleteOne({ schoolYearID });
-  res.json(deleteItem);
+    const findGrade = await Grade.find({ schoolYearID });
+    if (findGrade.length > 0) {
+      return res.status(400).json({
+        message: `Cannot delete year ${schoolYearID}, A record/s currently exists with year ${schoolYearID} in a Student Grade/s. To delete the record, Remove all records that contains ${schoolYearID} `,
+      });
+    }
+    const findEnrolled = await Enrolled.find({ schoolYearID });
+    if (findEnrolled.length > 0) {
+      return res.status(400).json({
+        message: `Cannot delete year ${schoolYearID}, A record/s currently exists with year ${schoolYearID} in Enrolled Student/s . To delete the record, Remove all records that contains ${schoolYearID} `,
+      });
+    }
+    const findTask = await Task.find({ schoolYearID });
+    if (findTask.length > 0) {
+      return res.status(400).json({
+        message: `Cannot delete year ${schoolYearID}, A record/s currently exists with year ${schoolYearID} in Tasks . To delete the record, Remove all records that contains ${schoolYearID} `,
+      });
+    }
+    // const findTaskScores = await TaskScore.find({ schoolYearID });
+    // if (findTaskScores.length > 0) {
+    //   return res.status(400).json({
+    //     message: `Cannot delete year ${schoolYearID}, A record/s currently exists with year ${schoolYearID} in Tasks Scores . To delete the record, Remove all records that contains ${schoolYearID} `,
+    //   });
+    // }
+    const deleteItem = await findID.deleteOne({ schoolYearID });
+    res.json(deleteItem);
+  } catch (error) {
+    console.log(
+      "🚀 ~ file: schoolyearController.js:103 ~ deleteDocByID ~ error",
+      error
+    );
+    req.status(500).json({ message: error.message });
+  }
 };
 
 const toggleStatusById = async (req, res) => {
-  const { schoolYearID, status } = req.body;
-  if (!schoolYearID) {
-    return res.status(400).json({ message: "ID required!" });
-  }
-  console.log("Request : ", req.body);
+  try {
+    const { schoolYearID, status } = req.body;
+    if (!schoolYearID) {
+      return res.status(400).json({ message: "ID required!" });
+    }
+    console.log("Request : ", req.body);
 
-  const findActive = await SchoolYear.findOne({ status: true }).exec();
-  console.log("findActive : ", findActive);
-  if (!findActive) {
-    const updateItem = await SchoolYear.findOneAndUpdate(
-      { schoolYearID },
-      {
-        status,
-      }
-    );
-    //const result = await response.save();
-    res.json(updateItem);
-  } else {
-    if (findActive.schoolYearID === schoolYearID) {
-      console.log(`New Active School Year : ${schoolYearID}`);
-      const updateItem = await SchoolYear.findOneAndUpdate(
+    const findActive = await SchoolYear.findOne({ status: true }).exec();
+    console.log("findActive : ", findActive);
+
+    if (findActive && findActive.schoolYearID === schoolYearID) {
+      const updateDoc = await SchoolYear.findOneAndUpdate(
         { schoolYearID },
         {
           status,
         }
       );
-      //const result = await response.save();
-      if (status === false) {
-        const updateLev = await Enrolled.updateMany(
-          { schoolYearID: { $in: schoolYearID.toLowerCase() } },
-          { $set: { status: status } }
+      if (updateDoc) {
+        const updateEnrollees = await Enrolled.updateMany(
+          { schoolYearID: { $in: schoolYearID } },
+          { $set: { status: false } }
         );
-        if (!updateLev) {
-          return res.status(400).json({ message: "No Level" });
-        }
+        console.log(updateEnrollees);
+        const updateTasks = await Task.updateMany(
+          { schoolYearID: { $in: schoolYearID } },
+          { $set: { status: false } }
+        );
+        console.log(updateTasks);
       }
-      res.status(200).json(updateItem);
+      res.json(updateDoc);
     } else {
-      return (
-        res.status(400).json({
-          message: `School Year ${findActive.schoolYearID} is still active!`,
-        }),
-        console.log(
-          `School Year : School Year ${findActive.schoolYearID} is still active!`
-        )
-      );
+      res
+        .status(400)
+        .json({ message: `Year ${findActive.schoolYearID} is still active!` });
     }
+  } catch (error) {
+    console.log(
+      "🚀 ~ file: schoolyearController.js:183 ~ toggleStatusById ~ error",
+      error
+    );
+    res.status(500).json({ message: error.message });
   }
 };
 

@@ -3,13 +3,13 @@ const User = require("../model/User");
 const Grade = require("../model/Grade");
 const Enrolled = require("../model/Enrolled");
 const Employee = require("../model/Employee");
+const TaskScore = require("../model/TaskScore");
 
 const createNewStudent = async (req, res) => {
   try {
     console.log("New Student :", req.body);
     const {
       studID,
-      LRN,
       firstName,
       middleName,
       lastName,
@@ -31,7 +31,7 @@ const createNewStudent = async (req, res) => {
     } = req.body;
 
     console.log(studID);
-    if (!studID || !LRN || !firstName || !lastName || !dateOfBirth || !gender) {
+    if (!studID || !firstName || !lastName || !dateOfBirth || !gender) {
       return res.status(400).json({ message: "Incomplete details!" });
     }
     // if (!Number(studID))
@@ -55,7 +55,6 @@ const createNewStudent = async (req, res) => {
       });
     const empObject = {
       studID,
-      LRN,
       firstName,
       middleName,
       lastName,
@@ -111,7 +110,6 @@ const updateStudentByID = async (req, res) => {
   }
   const {
     studID,
-    LRN,
     firstName,
     middleName,
     lastName,
@@ -140,7 +138,6 @@ const updateStudentByID = async (req, res) => {
   }
 
   const object = {
-    LRN,
     firstName,
     middleName,
     lastName,
@@ -165,7 +162,6 @@ const updateStudentByID = async (req, res) => {
   const update = await Student.findOneAndUpdate(
     { studID: req.params.studID },
     {
-      LRN,
       firstName,
       middleName,
       lastName,
@@ -208,21 +204,29 @@ const deleteStudentByID = async (req, res) => {
   console.log(findUser);
   if (findUser) {
     return res.status(400).json({
-      message: `Cannot delete ${studID} in Users collections, A record/s currently exists with ${studID}. To delete the record, Remove all records that contains ${studID} `,
+      message: `Cannot delete ${studID} in Students, A record/s currently exists with ${studID} in Users records. To delete the record, Remove all records that contains ${studID} `,
     });
   }
   const findGrade = await Grade.findOne({ studID }).exec();
   console.log(findGrade);
   if (findGrade) {
     return res.status(400).json({
-      message: `Cannot delete ${studID} in Grades, A record/s currently exists with ${studID}. To delete the record, Remove all records that contains ${studID} `,
+      message: `Cannot delete ${studID} in Students, A record/s currently exists with ${studID} in Grades records. To delete the record, Remove all records that contains ${studID} `,
     });
   }
   const findEnroll = await Enrolled.findOne({ studID }).exec();
   console.log(findEnroll);
   if (findEnroll) {
     return res.status(400).json({
-      message: `Cannot delete ${studID} in Enrolled, A record/s currently exists with ${studID}. To delete the record, Remove all records that contains ${studID} `,
+      message: `Cannot delete ${studID} in Students, A record/s currently exists with ${studID} in Enrollees records. To delete the record, Remove all records that contains ${studID} `,
+    });
+  }
+
+  const findTaskScore = await TaskScore.findOne({ studID }).exec();
+  console.log(findTaskScore);
+  if (findTaskScore) {
+    return res.status(400).json({
+      message: `Cannot delete ${studID} in Students, A record/s currently exists with ${studID} in Task Scores records. To delete the record, Remove all records that contains ${studID} `,
     });
   }
 

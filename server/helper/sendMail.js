@@ -20,20 +20,20 @@ const sendEmailRegister = (to, url, text, username) => {
   });
   const accessToken = oauth2client.getAccessToken();
   const smtpTransport = nodemailer.createTransport({
-    // service: "gmail",
-    // auth: {
-    //   type: "OAuth2",
-    //   user: ADMIN_EMAIL,
-    //   clientId: G_CLIENT_ID,
-    //   clientSecret: G_CLIENT_SECRET,
-    //   refreshToken: G_REFRESH_TOKEN,
-    //   accessToken,
-    host: "smtp.hostinger.com",
-    port: 465,
-    secure: true, // upgrade later with STARTTLS
+    service: "gmail",
     auth: {
-      user: "aus.studentportal@aus-portal.online",
-      pass: "P@$$WoRD12",
+      type: "OAuth2",
+      user: ADMIN_EMAIL,
+      clientId: G_CLIENT_ID,
+      clientSecret: G_CLIENT_SECRET,
+      refreshToken: G_REFRESH_TOKEN,
+      accessToken,
+      // host: "smtp.hostinger.com",
+      // port: 465,
+      // secure: true, // upgrade later with STARTTLS
+      // auth: {
+      //   user: "aus.studentportal@aus-portal.online",
+      //   pass: "P@$$WoRD12",
     },
   });
 
@@ -236,9 +236,11 @@ const sendEmailRegister = (to, url, text, username) => {
     </html>`,
   };
 
-  smtpTransport.sendMail(mailOptions, (err, info) => {
-    if (err) return { err };
-    return info;
+  smtpTransport.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log(error);
+    }
+    console.log("Message %s sent: %s", info.messageId, info.response);
   });
 };
 
@@ -248,21 +250,21 @@ const sendEmailReset = (to, url, text, name) => {
   });
   const accessToken = oauth2client.getAccessToken();
   const smtpTransport = nodemailer.createTransport({
-    // service: "gmail",
-    // auth: {
-    //   type: "OAuth2",
-    //   user: ADMIN_EMAIL,
-
-    //   clientId: G_CLIENT_ID,
-    //   clientSecret: G_CLIENT_SECRET,
-    //   refreshToken: G_REFRESH_TOKEN,
-    //   accessToken,
-    host: "smtp.hostinger.com",
-    port: 465,
-    secure: true, // upgrade later with STARTTLS
+    service: "gmail",
     auth: {
-      user: "aus.studentportal@aus-portal.online",
-      pass: "P@$$WoRD12",
+      type: "OAuth2",
+      user: ADMIN_EMAIL,
+
+      clientId: G_CLIENT_ID,
+      clientSecret: G_CLIENT_SECRET,
+      refreshToken: G_REFRESH_TOKEN,
+      accessToken,
+      // host: "smtp.hostinger.com",
+      // port: 465,
+      // secure: true, // upgrade later with STARTTLS
+      // auth: {
+      //   user: "aus.studentportal@aus-portal.online",
+      //   pass: "P@$$WoRD12",
     },
   });
 

@@ -1,5 +1,6 @@
 const Department = require("../model/Department");
 const Level = require("../model/Level");
+const Section = require("../model/Section");
 
 const getAllDoc = async (req, res) => {
   const doc = await Department.find().sort({ createdAt: -1 }).lean();
@@ -115,6 +116,13 @@ const toggleStatusById = async (req, res) => {
     );
     if (!updateLev) {
       return res.status(400).json({ message: "No Level" });
+    }
+    const updateSec = await Section.updateMany(
+      { departmentID: { $in: departmentID.toLowerCase() } },
+      { $set: { status: status } }
+    );
+    if (!updateSec) {
+      return res.status(400).json({ message: "No Section" });
     }
   }
 

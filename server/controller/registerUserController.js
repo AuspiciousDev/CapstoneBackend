@@ -82,12 +82,7 @@ const registerUserController = {
       const activationToken = createToken.activation(userObject);
       console.log(process.env.BASE_URL);
       const url = `${process.env.BASE_URL}/#/api/auth/activate/${activationToken}`;
-      sendMail.sendEmailRegister(
-        email,
-        url,
-        `Verify your email {debug check}`,
-        username
-      );
+      sendMail.sendEmailRegister(email, url, `Verify your email`, username);
       res.status(200).json({ message: "Welcome! Please check your email." });
       console.log("userObject :", userObject);
     } catch (error) {

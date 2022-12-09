@@ -108,9 +108,6 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    LRN: {
-      type: String,
-    },
     emergencyName: {
       type: String,
       required: true,
