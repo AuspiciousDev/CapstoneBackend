@@ -82,10 +82,12 @@ const createDoc = async (req, res) => {
       .exec();
     if (duplicate)
       return res.status(409).json({ message: "Duplicate Enrollee!" });
+    console.log("Enroll stud", studID);
     const isActive = await Student.findOne({
-      studID: studID,
-    });
-    if (!isActive)
+      studID,
+    }).exec();
+    console.log("Check Student Exists :", isActive);
+    if (!isActive || isActive === null)
       return res.status(409).json({ message: "Student does not exists!!" });
     if (isActive.status === false)
       return res.status(409).json({ message: "Student is not Active!" });

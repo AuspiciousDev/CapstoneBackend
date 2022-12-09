@@ -94,6 +94,7 @@ const getStudentByID = async (req, res) => {
   if (!req?.params?.studID) {
     return res.status(400).json({ message: "Student ID required!" });
   }
+  console.log(req.params.studID);
   const student = await Student.findOne({ studID: req.params.studID }).exec();
   if (!student) {
     return res
