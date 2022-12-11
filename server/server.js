@@ -19,6 +19,9 @@ const PORT = process.env.PORT || 4600;
 // Connect to MongoDB
 connectDB();
 
+//set the template engine
+app.set("view engine", "ejs");
+
 // custom middleware logger
 app.use(logger);
 
@@ -42,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 //serve static files
-app.use("/", express.static(path.join(__dirname, "/public")));
+app.use(express.static(path.resolve(__dirname, "public")));
 
 // API ROUTES
 app.use("/", require("./routes/root"));

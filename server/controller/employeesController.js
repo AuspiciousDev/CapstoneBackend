@@ -5,6 +5,8 @@ const Grade = require("../model/Grade");
 const TaskScore = require("../model/TaskScore");
 const Task = require("../model/Task");
 
+const csv = require("csvtojson");
+
 const createNewEmployee = async (req, res) => {
   try {
     const {
@@ -382,6 +384,95 @@ const toggleStatusById = async (req, res) => {
   //const result = await response.save();
   res.json(updateItem);
 };
+const importEmployee = async (req, res) => {
+  // try {
+  //   console.log(req.file.path);
+  //   res.sendStatus(200);
+  // } catch (error) {
+  //   res.sendStatus(500);
+  // }
+
+  try {
+    console.log(req);
+    let bulkTags = [];
+
+    await csv()
+      .fromFile(req.file.path)
+      .then(async (jsonObj) => {
+        console.log(jsonObj);
+        for (var x = 0; x < jsonObj; x++) {
+          temp = parseFloat(jsonObj[x].empID);
+          jsonObj[x].empID = temp;
+          temp = parseFloat(jsonObj[x].empType);
+          jsonObj[x].empType = temp;
+          temp = parseFloat(jsonObj[x].firstName);
+          jsonObj[x].firstName = temp;
+          temp = parseFloat(jsonObj[x].middleName);
+          jsonObj[x].middleName = temp;
+          temp = parseFloat(jsonObj[x].lastName);
+          jsonObj[x].lastName = temp;
+          temp = parseFloat(jsonObj[x].dateOfBirth);
+          jsonObj[x].dateOfBirth = temp;
+          temp = parseFloat(jsonObj[x].gender);
+          jsonObj[x].gender = temp;
+        }
+
+        jsonObj.forEach(async (tag) => {
+          bulkTags.push({
+            updateOne: {
+              filter: {
+                empID: tag.empID,
+                empType: tag.empType,
+                firstName: tag.firstName,
+                middleName: tag.middleName,
+              },
+              update: {
+                $set: {
+                  empID: tag.empID,
+                  empType: tag.empType,
+                  firstName: tag.firstName,
+                  middleName: tag.middleName,
+                  lastName: tag.lastName,
+                  dateOfBirth: tag.dateOfBirth,
+                  gender: tag.gender,
+                },
+              },
+              upsert: true,
+            },
+          });
+        });
+      });
+    console.log(
+      "🚀 ~ file: employeesController.js:448 ~ Employee.bulkWrite ~ bulkTags",
+      bulkTags
+    );
+
+    Employee.bulkWrite(bulkTags, (error, result) => {
+      if (error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        console.log(
+          "🚀 ~ file: employeesController.js:434 ~ Employee.bulkWrite ~ result",
+          result
+        );
+        res
+          .status(201)
+          .json({
+            message:
+              result?.nUpserted > 0
+                ? `Imported ${result?.nUpserted} of Employee Data.`
+                : `Matched [${result?.nMatched}] existing Employee. No new data is created!`,
+          });
+      }
+    });
+  } catch (error) {
+    console.log(
+      "🚀 ~ file: employeesController.js:415 ~ importEmployee ~ error",
+      error
+    );
+    res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
   getAllEmployees,
   createNewEmployee,
@@ -391,4 +482,5 @@ module.exports = {
   toggleStatusById,
   updateEmployeeIMG,
   updateEmployeeLoads,
+  importEmployee,
 };

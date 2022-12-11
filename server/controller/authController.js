@@ -17,7 +17,11 @@ const authController = {
       if (!foundUser)
         return res.status(401).json({ message: "Invalid Username/Password!" }); //Unauth
       // return res.status(401).json({ message: "Username not found" }); //Unauth
-
+      if (foundUser?.status === false) {
+        return res
+          .status(401)
+          .json({ message: "Your account has been disabled!" }); //Unauth
+      }
       //evaluate password
       const match = await bcrypt.compare(pwd, foundUser.password);
       if (match) {
@@ -72,7 +76,11 @@ const authController = {
     if (!foundUser)
       return res.status(401).json({ message: "Invalid Username/Password!" }); //Unauth
     // return res.status(401).json({ message: "Username not found" }); //Unauth
-
+    if (foundUser?.status === false) {
+      return res
+        .status(401)
+        .json({ message: "Your account has been disabled!" }); //Unauth
+    }
     //evaluate password
     const match = await bcrypt.compare(pwd, foundUser.password);
     if (match) {
@@ -93,7 +101,14 @@ const authController = {
       const user = await User.findOne({ email });
       if (!user)
         return res.status(400).json({ message: "This email does not exists!" });
-
+      if (user?.status === false) {
+        return res
+          .status(401)
+          .json({
+            message:
+              "Cannot request forgot password, Your account has been disabled!",
+          }); //Unauth
+      }
       //create access token
       const accessToken = createToken.access({ username: user.username });
       console.log("BASE URL:", process.env.BASE_URL);
@@ -105,7 +120,8 @@ const authController = {
 
       //success
       res.status(200).json({
-        message: "Password reset token has been sent, Please check your inbox or spam email.",
+        message:
+          "Password reset token has been sent, Please check your inbox or spam email.",
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -126,10 +142,7 @@ const authController = {
       if (!foundUser)
         return res.status(404).json({ message: "Invalid Username/Password!" }); //Unauth
       // return res.status(401).json({ message: "Username not found" }); //Unauth
-      const compareOldNew = await bcrypt.compare(
-        password,
-        foundUser.password
-      );
+      const compareOldNew = await bcrypt.compare(password, foundUser.password);
       if (compareOldNew)
         return res.status(400).json({
           message: `Current and New password is just the same!, Use a new password instead.`,

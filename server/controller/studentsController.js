@@ -4,7 +4,7 @@ const Grade = require("../model/Grade");
 const Enrolled = require("../model/Enrolled");
 const Employee = require("../model/Employee");
 const TaskScore = require("../model/TaskScore");
-
+const csv = require("csvtojson");
 const createNewStudent = async (req, res) => {
   try {
     console.log("New Student :", req.body);
@@ -310,6 +310,88 @@ const updateIMG = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+const importStudent = async (req, res) => {
+  // try {
+  //   console.log(req.file.path);
+  //   res.sendStatus(200);
+  // } catch (error) {
+  //   res.sendStatus(500);
+  // }
+
+  try {
+    console.log(req);
+    let bulkTags = [];
+
+    await csv()
+      .fromFile(req.file.path)
+      .then(async (jsonObj) => {
+        console.log(jsonObj);
+        for (var x = 0; x < jsonObj; x++) {
+          temp = parseFloat(jsonObj[x].studID);
+          jsonObj[x].studID = temp;
+          temp = parseFloat(jsonObj[x].firstName);
+          jsonObj[x].firstName = temp;
+          temp = parseFloat(jsonObj[x].middleName);
+          jsonObj[x].middleName = temp;
+          temp = parseFloat(jsonObj[x].lastName);
+          jsonObj[x].lastName = temp;
+          temp = parseFloat(jsonObj[x].dateOfBirth);
+          jsonObj[x].dateOfBirth = temp;
+          temp = parseFloat(jsonObj[x].empGender);
+          jsonObj[x].empGender = temp;
+        }
+
+        jsonObj.forEach((tag) => {
+          bulkTags.push({
+            updateOne: {
+              filter: {
+                studID: tag.studID,
+                firstName: tag.firstName,
+                middleName: tag.middleName,
+              },
+              update: {
+                $set: {
+                  studID: tag.studID,
+                  firstName: tag.firstName,
+                  middleName: tag.middleName,
+                  lastName: tag.lastName,
+                  dateOfBirth: tag.dateOfBirth,
+                  gender: tag.empGender,
+                },
+              },
+              upsert: true,
+            },
+          });
+          importCount = +1;
+        });
+      });
+    Student.bulkWrite(bulkTags, (error, result) => {
+      if (error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        console.log(
+          "🚀 ~ file: studentsController.js:367 ~ Employee.bulkWrite ~ result",
+          result
+        );
+
+        res.status(201).json({
+          message:
+            result?.nUpserted > 0
+              ? `Imported ${result?.nUpserted} of Student Data.`
+              : `Matched [${result?.nMatched}] existing Student. No new data is created!`,
+        });
+      }
+    });
+  } catch (error) {
+    console.log(
+      "🚀 ~ file: studentsController.js:379 ~ importStudent ~ error",
+      error
+    );
+
+    res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
   createNewStudent,
   getAllStudents,
@@ -318,4 +400,5 @@ module.exports = {
   deleteStudentByID,
   toggleStatusById,
   updateIMG,
+  importStudent,
 };

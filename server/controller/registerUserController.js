@@ -83,7 +83,10 @@ const registerUserController = {
       console.log(process.env.BASE_URL);
       const url = `${process.env.BASE_URL}/#/api/auth/activate/${activationToken}`;
       sendMail.sendEmailRegister(email, url, `Verify your email`, username);
-      res.status(200).json({ message: "Welcome! Please check your email." });
+      res.status(200).json({
+        message:
+          "A verification has been sent to you email, Please check your inbox or spam mail.",
+      });
       console.log("userObject :", userObject);
     } catch (error) {
       res.status(500).json({ message: error.message });
