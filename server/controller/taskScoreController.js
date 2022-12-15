@@ -62,6 +62,12 @@ const getAllDoc = async (req, res) => {
         taskName: {
           $toString: "$profile.taskName",
         },
+        levelID: {
+          $toString: "$profile.levelID",
+        },
+        sectionID: {
+          $toString: "$profile.sectionID",
+        },
         taskType: {
           $toString: "$profile.taskType",
         },

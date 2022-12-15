@@ -4,6 +4,8 @@ const User = require("../model/User");
 const Grade = require("../model/Grade");
 const TaskScore = require("../model/TaskScore");
 const Task = require("../model/Task");
+const Enrolled = require("../model/Enrolled");
+const SchoolYear = require("../model/SchoolYear");
 
 const csv = require("csvtojson");
 
@@ -29,7 +31,6 @@ const createNewEmployee = async (req, res) => {
       address,
       city,
       province,
-      email,
       mobile,
       telephone,
       emergencyName,
@@ -157,7 +158,6 @@ const updateEmployeeByID = async (req, res) => {
     address,
     city,
     province,
-    email,
     mobile,
     telephone,
     emergencyName,
@@ -191,7 +191,6 @@ const updateEmployeeByID = async (req, res) => {
     address,
     city,
     province,
-    email,
     mobile,
     telephone,
     emergencyName,
@@ -219,7 +218,6 @@ const updateEmployeeByID = async (req, res) => {
       address,
       city,
       province,
-      email,
       mobile,
       telephone,
       emergencyName,
@@ -274,47 +272,107 @@ const updateEmployeeIMG = async (req, res) => {
 };
 
 const updateEmployeeLoads = async (req, res) => {
-  if (!req?.params?.empID) {
-    return res.status(400).json({ message: "Employee ID params is required!" });
-  }
-  console.log(req.body);
-  const { empID, levelLoad, sectionLoad, subjectLoad } = req.body;
-
-  if (!empID) {
-    return res.status(400).json({ message: "Employee ID is required!" });
-  }
-  if (empID !== req?.params?.empID) {
-    return res
-      .status(400)
-      .json({ message: "Provided Employee ID and Request ID does not match!" });
-  }
-
-  const response = await Employee.findOne({ empID: req.params.empID }).exec();
-  if (!response) {
-    return res.status(204).json({ message: "Employee doesn't exists!" });
-  }
-  const empObject = {
-    empID,
-    SubjectLoads: subjectLoad.types,
-    LevelLoads: levelLoad.types,
-    SectionLoads: sectionLoad.types,
-  };
-
-  const update = await Employee.findOneAndUpdate(
-    { empID: req.params.empID },
-    {
-      $set: {
-        LevelLoads: empObject.LevelLoads,
-        SectionLoads: empObject.SectionLoads,
-        SubjectLoads: empObject.SubjectLoads,
-      },
+  try {
+    if (!req?.params?.empID) {
+      return res
+        .status(400)
+        .json({ message: "Employee ID params is required!" });
     }
-  );
-  console.log(update);
-  if (!update) {
-    return res.status(400).json({ error: "Employee Loads update failed!" });
+    console.log(req.body);
+    const { empID, levelLoad, sectionLoad, subjectLoad } = req.body;
+
+    if (!empID) {
+      return res.status(400).json({ message: "Employee ID is required!" });
+    }
+    if (empID !== req?.params?.empID) {
+      return res.status(400).json({
+        message: "Provided Employee ID and Request ID does not match!",
+      });
+    }
+    console.log(
+      "🚀 ~ file: employeesController.js:298 ~ updateEmployeeLoads ~  levelLoad.length",
+      levelLoad.types.length
+    );
+    const response = await Employee.findOne({ empID: req.params.empID }).exec();
+    if (!response) {
+      return res.status(204).json({ message: "Employee doesn't exists!" });
+    }
+    if (response.SubjectLoads.length > 3 || subjectLoad.types.length > 3) {
+      return res
+        .status(400)
+        .json({ message: "Employee can only have 3 total subjects" });
+    }
+    if (response.LevelLoads.length > 2 || levelLoad.types.length > 2) {
+      return res
+        .status(400)
+        .json({ message: "Employee can only have 2 total Levels" });
+    }
+    if (response.SectionLoads.length > 5 || sectionLoad.types.length > 5) {
+      return res
+        .status(400)
+        .json({ message: "Employee can only have 5 total Sections" });
+    }
+    const findSY = await SchoolYear.findOne({ status: true }).exec();
+    console.log(
+      "🚀 ~ file: employeesController.js:315 ~ updateEmployeeLoads ~ findSY",
+      findSY.schoolYearID
+    );
+    if (!findSY) {
+      return res
+        .status(400)
+        .json({ message: ` No Active School Year not found!` });
+    }
+
+    const getTotalStudent = await Enrolled.find().lean().exec();
+    const getTotal = await getTotalStudent.filter((fill) => {
+      return (
+        fill?.status === true &&
+        levelLoad &&
+        levelLoad.types.some((e) => e === fill.levelID) &&
+        fill?.schoolYearID === findSY.schoolYearID &&
+        sectionLoad &&
+        sectionLoad.types.some((e) => e === fill.sectionID)
+        // console.log(levelLoad.types)
+      );
+    }).length;
+    console.log(
+      "🚀 ~ file: employeesController.js:338 ~ getTotal ~ getTotal",
+      getTotal
+    );
+    if (getTotal > 200) {
+      return res.status(400).json({
+        message: "Employee can only handle 200 students!",
+      });
+    }
+    const empObject = {
+      empID,
+      SubjectLoads: subjectLoad.types,
+      LevelLoads: levelLoad.types,
+      SectionLoads: sectionLoad.types,
+    };
+
+    const update = await Employee.findOneAndUpdate(
+      { empID: req.params.empID },
+      {
+        $set: {
+          LevelLoads: empObject.LevelLoads,
+          SectionLoads: empObject.SectionLoads,
+          SubjectLoads: empObject.SubjectLoads,
+        },
+      }
+    );
+    console.log(update);
+    if (!update) {
+      return res.status(400).json({ error: "Employee Loads update failed!" });
+    }
+    res.json(update);
+  } catch (error) {
+    console.log(
+      "🚀 ~ file: employeesController.js:342 ~ updateEmployeeLoads ~ error",
+      error
+    );
+    return res.status(500).json({ message: error.message });
   }
-  res.json(update);
 };
 
 const deleteEmployeeByID = async (req, res) => {
@@ -455,14 +513,12 @@ const importEmployee = async (req, res) => {
           "🚀 ~ file: employeesController.js:434 ~ Employee.bulkWrite ~ result",
           result
         );
-        res
-          .status(201)
-          .json({
-            message:
-              result?.nUpserted > 0
-                ? `Imported ${result?.nUpserted} of Employee Data.`
-                : `Matched [${result?.nMatched}] existing Employee. No new data is created!`,
-          });
+        res.status(201).json({
+          message:
+            result?.nUpserted > 0
+              ? `Imported ${result?.nUpserted} of Employee Data.`
+              : `Matched [${result?.nMatched}] existing Employee. No new data is created!`,
+        });
       }
     });
   } catch (error) {

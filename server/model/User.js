@@ -23,7 +23,17 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-
+    loginAttemptCount: {
+      type: Number,
+      default: 0,
+    },
+    loginStatus: {
+      type: Boolean,
+      default: true,
+    },
+    loginToken: {
+      type: String,
+    },
     roles: [
       {
         type: Number,
