@@ -35,6 +35,11 @@ const authController = {
       if (!foundUser) {
         await redis.set(user, ++userAttempts, "ex", timeWindowForFailedLogins);
         res.status(401).json({ message: "Invalid Username or Password!" });
+      }
+      if (foundUser?.status === false) {
+        return res
+          .status(401)
+          .json({ message: "Your account has been disabled!" }); //Unauth
       } else {
         const match = await bcrypt.compare(pwd, foundUser.password);
         if (match) {

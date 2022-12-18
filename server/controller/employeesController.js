@@ -58,8 +58,7 @@ const createNewEmployee = async (req, res) => {
       return res.status(409).json({
         message: `Employee ID ${empID} already exist in Student records.`,
       });
-    // const duplicateEmail = await Employee.findOne({ email }).exec();
-    // if (duplicateEmail)
+
     const empObject = {
       empID,
       empType: empType.types,
@@ -80,7 +79,6 @@ const createNewEmployee = async (req, res) => {
       address,
       city,
       province,
-      email,
       mobile,
       telephone,
       emergencyName,
